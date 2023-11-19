@@ -14,15 +14,12 @@ public:
 	inline double x() const {return e[0];}
 	inline double y() const {return e[1];}
 	inline double z() const {return e[2];}
-	inline double r() const {return e[0];}
-	inline double g() const {return e[1];}
-	inline double b() const {return e[2];}
 	
     inline const point3 &operator+() const { return *this; }
     inline vec3 operator-() const { return vec3(-e[0], -e[1], -e[2]); }
 	inline double operator[](int i) const {return e[i];}
 	inline double& operator[](int i) {return e[i];}
-	
+
 	double e[3];
 };
 
