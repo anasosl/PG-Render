@@ -15,20 +15,18 @@ class camera{
     vec3 u;
     vec3 v;
 
-    camera(point3 &or, point3 &al, vec3 &cima);
+    camera(const point3 &or, const point3 &al, const vec3 &cima);
 };
 
-camera::camera(point3 &or, point3 &al, vec3 &cima){
-    origem = or;
-    alvo = al;
-    up = cima;
-    w = alvo - origem;
-    w.make_unit_vector;
-    u = cross(w, up);
-    u.make_unit_vector;
-    v = cross(w, u);
-    v.make_unit_vector;
-
+camera::camera(const point3 &or, const point3 &al, const vec3 &cima){
+    origem(or);
+    alvo(al);
+    up(cima);
+    w(alvo - origem);
+    u(vec3::cross(w, up));
+    v(vec3::cross(w, u));
+    w.make_unit_vector();
+    u.make_unit_vector();
+    v.make_unit_vector();
 }
-camera
 #endif
