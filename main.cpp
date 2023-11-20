@@ -17,32 +17,31 @@ vec3 color(const ray &r, const geometricObj &obj)
 int main()
 {
     ofstream f_out;
-    f_out.open("test2.ppm");
-    camera cam(point3(0,0,0), point3(3,3,3), vec3(0,1,0));
+    f_out.open("test4.ppm");
+    point3 origem = point3(20, 0, 0);
+    point3 alvo = point3(1, 0, 0);
+    vec3 cima = vec3(0, 0, 1);
+    Camera cam(origem, alvo, cima);
     int ds;
     int resh;
     int resv;
-    cin>>ds>>resh>>resv;
+    cin >> ds >> resh >> resv;
     int tamx = 1;
     int tamy = 1;
-    vec3 qx = 2*tamx/(resh-1)*cam.u;
-    vec3 qy = 2*tamy/(resv-1)*cam.v;
-    vec3 ct_inf_esq = ds*cam.w - tamx*cam.u - tamy*cam.v;
-    
-    
+    vec3 qx = 2 * tamx / (resh - 1) * cam.u;
+    vec3 qy = 2 * tamy / (resv - 1) * cam.v;
+    vec3 canto_inf_esq = ds * cam.w - tamx * cam.u - tamy * cam.v;
 
-    sphere sp(point3(0.0, 0.0, 2), 0.5, vec3(1.0, 0.0, 0.0));
+    sphere sp(point3(0.0, 0.0, 0.0), 10, vec3(1.0, 0.0, 0.0));
 
     f_out << "P3\n";
-    f_out << width << " " << height << "\n255\n";
+    f_out << resh << " " << resv << "\n255\n";
 
-    for (int y = height - 1; y >= 0; y--)
+    for (int y = resh - 1; y >= 0; y--)
     {
-        for (int x = 0; x < width; x++)
+        for (int x = 0; x < resv; x++)
         {
-            double u = double(x) / double(width);
-            double v = double(y) / double(height);
-            ray r(origin, lower_left_corner + u * horizontal + v * vertical);
+            ray r(origem, canto_inf_esq + x * qx + y * qy);
             vec3 col = color(r, sp);
             int ir = int(255.99 * col.r());
             int ig = int(255.99 * col.g());
@@ -50,4 +49,5 @@ int main()
             f_out << ir << ' ' << ig << ' ' << ib << '\n';
         }
     }
+    return 0;
 }
