@@ -10,11 +10,12 @@ public:
 
     bool intersect(const ray &r) const
     {
-        vec3 oc = r.origin() - Center;
+        
+        vec3 oc = (r.origin()) - (Center);
         double a = dot(r.direction(), r.direction());
         double b = 2.0 * dot(oc, r.direction());
-        double c = dot(oc, oc) - Radious * Radious;
-        double discriminant = b * b - 4 * a * c;
+        double c = dot(oc, oc) - (Radious * Radious);
+        double discriminant = (b * b) - (4 * a * c);
         return (discriminant > 0);
     }
 
