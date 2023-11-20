@@ -3,6 +3,8 @@
 #include "ray.h"
 #include "sphere.h"
 #include "geometricObj.h"
+#include "camera.h"
+using namespace std;
 
 vec3 color(const ray &r, const geometricObj &obj)
 {
@@ -14,15 +16,20 @@ vec3 color(const ray &r, const geometricObj &obj)
 
 int main()
 {
-    std::ofstream f_out;
+    ofstream f_out;
     f_out.open("test2.ppm");
-
-    int width = 400;
-    int height = 400;
-    vec3 lower_left_corner(-1.0, -1.0, 1.0);
-    vec3 horizontal(1.0, 0.0, 0.0);
-    vec3 vertical(0.0, 1.0, 0.0);
-    point3 origin(0.0, 0.0, 0.0);
+    camera cam(point3(0,0,0), point3(3,3,3), vec3(0,1,0));
+    int ds;
+    int resh;
+    int resv;
+    cin>>ds>>resh>>resv;
+    int tamx = 1;
+    int tamy = 1;
+    vec3 qx = 2*tamx/(resh-1)*cam.u;
+    vec3 qy = 2*tamy/(resv-1)*cam.v;
+    vec3 ct_inf_esq = ds*cam.w - tamx*cam.u - tamy*cam.v;
+    
+    
 
     sphere sp(point3(0.0, 0.0, 2), 0.5, vec3(1.0, 0.0, 0.0));
 
