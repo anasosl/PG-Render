@@ -41,7 +41,6 @@ int main()
     {
         for (int x = 0; x < resv; x++)
         {
-            vec3 teste = canto_inf_esq + (x * qx) + (y * qy);
             ray r(origem, canto_inf_esq + (x * qx) + (y * qy));
             vec3 col = color(r, sp);
             int ir = int( col.r());
