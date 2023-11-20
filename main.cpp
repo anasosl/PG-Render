@@ -18,21 +18,21 @@ int main()
 {
     ofstream f_out;
     f_out.open("test4.ppm");
-    point3 origem = point3(20, 0, 0);
+    point3 origem = point3(0, 0, 0);
     point3 alvo = point3(1, 0, 0);
-    vec3 cima = vec3(0, 0, 1);
+    vec3 cima = vec3(0, 1, 0);
     Camera cam(origem, alvo, cima);
-    int ds;
-    int resh;
-    int resv;
-    cin >> ds >> resh >> resv;
-    int tamx = 1;
-    int tamy = 1;
-    vec3 qx = 2 * tamx / (resh - 1) * cam.u;
-    vec3 qy = 2 * tamy / (resv - 1) * cam.v;
+    int ds=1;
+    int resh=500;
+    int resv=500;
+    //cin >> ds >> resh >> resv;
+    double tamx = 1;
+    double tamy = 1;
+    vec3 qx = (2 * tamx / (resh - 1)) * cam.u;
+    vec3 qy = (2 * tamy / (resv - 1)) * cam.v;
     vec3 canto_inf_esq = ds * cam.w - tamx * cam.u - tamy * cam.v;
 
-    sphere sp(point3(0.0, 0.0, 0.0), 10, vec3(1.0, 0.0, 0.0));
+    sphere sp(point3(4, 0.0, 0.0), 1.5, vec3(255, 0, 0));
 
     f_out << "P3\n";
     f_out << resh << " " << resv << "\n255\n";
@@ -41,11 +41,12 @@ int main()
     {
         for (int x = 0; x < resv; x++)
         {
-            ray r(origem, canto_inf_esq + x * qx + y * qy);
+            vec3 teste = canto_inf_esq + (x * qx) + (y * qy);
+            ray r(origem, canto_inf_esq + (x * qx) + (y * qy));
             vec3 col = color(r, sp);
-            int ir = int(255.99 * col.r());
-            int ig = int(255.99 * col.g());
-            int ib = int(255.99 * col.b());
+            int ir = int( col.r());
+            int ig = int(col.g());
+            int ib = int(col.b());
             f_out << ir << ' ' << ig << ' ' << ib << '\n';
         }
     }
