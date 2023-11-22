@@ -2,17 +2,33 @@
 #include <iostream>
 #include "ray.h"
 #include "sphere.h"
+#include "plane.h"
 #include "geometricObj.h"
 #include "camera.h"
+#include <bits/stdc++.h>
 using namespace std;
 
-vec3 color(const ray &r, double dist, const geometricObj &obj)
+vec3 color(const ray &r, double dist, vector<geometricObj> &objects)
 {
-    // a interseção só é válida se ocorrer depois do plano
-    if (obj.intersect(r) > dist)
-        return obj.color();
-    else
-        return vec3(0.0, 0.0, 0.0);
+
+    vector<pair<double, int>> ts;
+    for (int i = 0; i < objects.size(); i++) {
+        double t = objects[i].intersect(r);
+        // a interseção só é válida se ocorrer depois do plano
+        if (t > dist)
+            ts.push_back({t, i});
+    }
+
+    sort(ts.begin(), ts.end());
+    if (ts.empty()) {
+        return vec3(0,0,0);
+    }
+        return objects[ts[0].second].color();
+    
+
+    
+    
+    
 }
 
 int main()
@@ -34,6 +50,11 @@ int main()
     vec3 canto_inf_esq = dist * cam.w - tamx * cam.u - tamy * cam.v;
 
     sphere sp(point3(4, 0.0, 0.0), 1.5, vec3(255, 0, 0));
+    plane pl(point3(7,0,0), vec3(1, 0, 0), vec3(0,0, 255));
+
+    vector<geometricObj> objects;
+    objects.push_back(sp);
+    objects.push_back(pl);
 
     f_out << "P3\n";
     f_out << resh << " " << resv << "\n255\n";
@@ -43,7 +64,7 @@ int main()
         for (int x = 0; x < resv; x++)
         {
             ray r(origem, canto_inf_esq + (x * qx) + (y * qy));
-            vec3 col = color(r, dist, sp);
+            vec3 col = color(r, dist, objects);
             int ir = int(col.r());
             int ig = int(col.g());
             int ib = int(col.b());
