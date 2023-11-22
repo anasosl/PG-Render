@@ -8,12 +8,13 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-vec3 color(const ray &r, double dist, vector<geometricObj> &objects)
+vec3 color(const ray &r, double dist, vector<geometricObj*> &objects)
 {
 
     vector<pair<double, int>> ts;
     for (int i = 0; i < objects.size(); i++) {
-        double t = objects[i].intersect(r);
+        geometricObj* obj = objects[i]; 
+        double t = obj->intersect(r);
         // a interseção só é válida se ocorrer depois do plano
         if (t > dist)
             ts.push_back({t, i});
@@ -23,7 +24,8 @@ vec3 color(const ray &r, double dist, vector<geometricObj> &objects)
     if (ts.empty()) {
         return vec3(0,0,0);
     }
-        return objects[ts[0].second].color();
+    geometricObj* objf = objects[ts[0].second];
+        return objf->color();
     
 
     
@@ -49,17 +51,17 @@ int main()
     vec3 qy = (2 * tamy / (resv - 1)) * cam.v;
     vec3 canto_inf_esq = dist * cam.w - tamx * cam.u - tamy * cam.v;
 
-    sphere sp(point3(4, 0.0, 0.0), 1.5, vec3(255, 0, 0));
-    plane pl(point3(7,0,0), vec3(1, 0, 0), vec3(0,0, 255));
+    sphere sp(point3(10, 0.0, 0.0), 1.5, vec3(255, 0, 0));
+    plane pl(point3(3,0,0), vec3(-1, 0, 0), vec3(0,0, 255));
 
-    vector<geometricObj> objects;
-    objects.push_back(sp);
-    objects.push_back(pl);
+    vector<geometricObj *> objects;
+    objects.push_back(&sp);
+    objects.push_back(&pl);
 
     f_out << "P3\n";
     f_out << resh << " " << resv << "\n255\n";
 
-    for (int y = resh - 1; y >= 0; y--)
+    for (int y = 0; y < resh; y++)
     {
         for (int x = 0; x < resv; x++)
         {
