@@ -19,7 +19,7 @@ public:
         double b = dot(Normal, og);
         double c = dot(Normal, r.direction());
 
-        if (!c) {
+        if (c != 0) {
             t = (a - b) / c;
         }
     
@@ -31,4 +31,4 @@ public:
     vec3 Normal;
 };
 
-#endif
+#endif  
