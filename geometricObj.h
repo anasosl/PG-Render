@@ -3,15 +3,20 @@
 
 #include "ray.h"
 
-class geometricObj
+//superclasse dos objetos geometricos
+class GeometricObj
 {
 public:
-    geometricObj(vec3 color) { Color = color; }
 
-    inline vec3 color() const { return Color; }
-    virtual double intersect(const ray &r) const = 0;
+    //determina o vetor de cores do objeto
+    GeometricObj(Vec3 color) { Color = color; }
 
-    vec3 Color;
+    //retorna o vetor de cores do objeto
+    inline Vec3 color() const { return Color; }
+
+    virtual double intersect(const Ray &r) const = 0;
+
+    Vec3 Color;
 };
 
 #endif

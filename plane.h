@@ -2,19 +2,20 @@
 #define PLANEH
 #include "geometricObj.h"
 
-class plane : public geometricObj
+class Plane : public GeometricObj
 {
 public:
-    plane(const point3 &planepoint, const vec3& normal, const vec3 &color)
-        : geometricObj(color), Normal(normal), PP(planepoint) {}
+    Plane(const Point3 &planepoint, const Vec3& normal, const Vec3 &color)
+        : GeometricObj(color), Normal(normal), PP(planepoint) {}
 
-    double intersect(const ray &r) const
+    double intersect(const Ray &r) const
     {
         double t;
+        
+        Vec3 pp = Vec3(PP.x(), PP.y(), PP.z());
+        Vec3 og = Vec3(r.origin().x(), r.origin().y(), r.origin().z());
 
-        vec3 pp = vec3(PP.x(), PP.y(), PP.z());
-        vec3 og = vec3(r.origin().x(), r.origin().y(), r.origin().z());
-
+        //produtos escalares
         double a = dot(Normal, pp);
         double b = dot(Normal, og);
         double c = dot(Normal, r.direction());
@@ -27,8 +28,8 @@ public:
         return t;
     }
 
-    point3 PP;
-    vec3 Normal;
+    Point3 PP;
+    Vec3 Normal;
 };
 
-#endif  
+#endif
