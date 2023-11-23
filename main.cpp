@@ -8,12 +8,13 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-vec3 color(const ray &r, double dist, vector<geometricObj*> &objects)
+vec3 color(const ray &r, double dist, vector<geometricObj *> &objects)
 {
 
     vector<pair<double, int>> ts;
-    for (int i = 0; i < objects.size(); i++) {
-        geometricObj* obj = objects[i]; 
+    for (int i = 0; i < objects.size(); i++)
+    {
+        geometricObj *obj = objects[i];
         double t = obj->intersect(r);
         // a interseção só é válida se ocorrer depois do plano
         if (t > dist)
@@ -21,16 +22,12 @@ vec3 color(const ray &r, double dist, vector<geometricObj*> &objects)
     }
 
     sort(ts.begin(), ts.end());
-    if (ts.empty()) {
-        return vec3(0,0,0);
+    if (ts.empty())
+    {
+        return vec3(0, 0, 0);
     }
-    geometricObj* objf = objects[ts[0].second];
-        return objf->color();
-    
-
-    
-    
-    
+    geometricObj *objf = objects[ts[0].second];
+    return objf->color();
 }
 
 int main()
@@ -51,19 +48,21 @@ int main()
     vec3 qy = (2 * tamy / (resv - 1)) * cam.v;
     vec3 canto_inf_esq = dist * cam.w - tamx * cam.u - tamy * cam.v;
 
-    sphere sp(point3(5, 0.0, 0.0), 1.5, vec3(255, 0, 0));
-    plane pl(point3(10,0,0), vec3(-1, 0, 0), vec3(0,0, 255));
+    sphere sp(point3(3.5, 0.0, -0.7), 1.5, vec3(200, 50, 0));
+    sphere sp1(point3(7, 0.0, 1.0), 3.0, vec3(200, 250, 0));
+    plane pl(point3(0, 1, 0), vec3(0, 1, 0), vec3(20, 20, 150));
 
     vector<geometricObj *> objects;
     objects.push_back(&sp);
+    objects.push_back(&sp1);
     objects.push_back(&pl);
 
     f_out << "P3\n";
     f_out << resh << " " << resv << "\n255\n";
 
-    for (int y = 0; y < resh; y++)
+    for (int y = resv - 1; y >= 0; y--)
     {
-        for (int x = 0; x < resv; x++)
+        for (int x = 0; x < resh; x++)
         {
             ray r(origem, canto_inf_esq + (x * qx) + (y * qy));
             vec3 col = color(r, dist, objects);
