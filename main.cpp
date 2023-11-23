@@ -43,11 +43,11 @@ int main()
     
     cout << "\nPara a inicialização, você precisará colocar 9 doubles (3 para a origem, 3 para o alvo e 3 para determinar o vetor cima)\n";
     cin >> x >> y >> z;
-    origem = (x, y, z);
+    origem = point3(x, y, z);
     cin >> x >> y >> z;
-    alvo = (x, y, z);
+    alvo = point3(x, y, z);
     cin >> x >> y >> z;
-    cima = (x, y, z)
+    cima = vec3(x, y, z);
     
     Camera cam(origem, alvo, cima);
     int dist;
@@ -78,21 +78,21 @@ int main()
         if (type == "sphere"){
             cout << "\nPara a esfera, você precisará colocar 7 doubles (3 para o centro, 1 para o raio e 3 para as cores)\n";
             cin >> x >> y >> z;
-            p = (x, y, z);
+            p = point3(x, y, z);
             cin >> r;
             cin >> x >> y >> z;
-            v1 = (x, y, z)
+            v1 = vec3(x, y, z);
             sphere sp(p, r, v1);
             objects.push_back(&sp);
             
         } else if (type == "plane"){
             cout << "\nPara o plano, você precisará colocar 9 doubles (3 para o centro, 3 para a normal e 3 para as cores)\n";
             cin >> x >> y >> z;
-            p = (x, y, z);
+            p = point3(x, y, z);
             cin >> x >> y >> z;
-            v1 = (x, y, z);
+            v1 = vec3(x, y, z);
             cin >> x >> y >> z;
-            v2 = (x, y, z)
+            v2 = vec3(x, y, z);
             plane pl(p, v1, v2);
             objects.push_back(&pl);
             
