@@ -14,7 +14,7 @@ public:
         up = cima;
         w = alvo - origem;
         u = cross(w, up);
-        v = cross(w, u);
+        v = cross(u, w);
         w.make_unit_vector();
         u.make_unit_vector();
         v.make_unit_vector();
