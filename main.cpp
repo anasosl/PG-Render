@@ -40,11 +40,13 @@ int main()
     point3 alvo;
     vec3 cima;
 
-    cout << "\nPara inicializar, tu precisas colocar 9 doubles (3 para a origem, 3 para o alvo e 3 para determinar o vetor cima)\n";
+    cout << "Origem da camera (3 doubles): \n";
     cin >> x >> y >> z;
     origem = point3(x, y, z);
+    cout << "Alvo (3 doubles): \n";
     cin >> x >> y >> z;
     alvo = point3(x, y, z);
+    cout << "Up vector (3 doubles): \n";
     cin >> x >> y >> z;
     cima = vec3(x, y, z);
 
@@ -53,8 +55,12 @@ int main()
     int resh;
     int resv;
 
-    cout << "\nAgora, tu precisas colocar 3 inteiros (distancia da camera para a tela, resolucao horizontal e resolucao vertical)\n";
-    cin >> dist >> resh >> resv;
+    cout << "Distancia (1 int): \n";
+    cin >> dist;
+    cout << "Resolucao v (1 int): \n";
+    cin >> resh;
+    cout << "Resolucao h (1 int): \n";
+    cin >> resv;
 
     double tamx = 1;
     double tamy = 1;
@@ -64,6 +70,7 @@ int main()
 
     vector<geometricObj *> objects;
 
+    cout << "\ndigite end para gerar a imagem | plane para adicionar um plano | sphere para adicionar uma esfera\n";
     while (true)
     {
         string type = "";
@@ -72,15 +79,17 @@ int main()
         double r;
         vec3 v1, v2;
 
-        cout << "\nPara cada objeto, coloque sphere ou plane. Se tu nao quiseres adicionar outro objeto, digite end.\n";
+        cout << "\nTipo de objeto: \n";
         cin >> type;
 
         if (type == "sphere")
         {
-            cout << "\nPara a esfera, tu precisas colocar 7 doubles (3 para o centro, 1 para o raio e 3 para as cores)\n";
+            cout << "Centro (3 doubles): \n";
             cin >> x >> y >> z;
             p = point3(x, y, z);
+            cout << "Raio (1 double): \n";
             cin >> r;
+            cout << "Cor (3 doubles): \n";
             cin >> x >> y >> z;
             v1 = vec3(x, y, z);
             sphere *sp = new sphere(p, r, v1);
@@ -88,11 +97,13 @@ int main()
         }
         else if (type == "plane")
         {
-            cout << "\nPara o plano, tu precisas colocar 9 doubles (3 para o centro, 3 para a normal e 3 para as cores)\n";
+            cout << "Ponto do plano (3 doubles): \n";
             cin >> x >> y >> z;
             p = point3(x, y, z);
+            cout << "Vetor normal (3 doubles): \n";
             cin >> x >> y >> z;
             v1 = vec3(x, y, z);
+            cout << "Cor (3 doubles): \n";
             cin >> x >> y >> z;
             v2 = vec3(x, y, z);
             plane *pl = new plane(p, v1, v2);
