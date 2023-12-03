@@ -8,7 +8,7 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-vec3 color(const ray &r, double dist, vector<geometricObj *> &objects)
+vec3 color(const ray &r, vector<geometricObj *> &objects)
 {
     vector<pair<double, int>> ts;
     for (long long unsigned int i = 0; i < objects.size(); i++)
@@ -16,7 +16,7 @@ vec3 color(const ray &r, double dist, vector<geometricObj *> &objects)
         geometricObj *obj = objects[i];
         double t = obj->intersect(r);
         // a interseção só é válida se ocorrer depois do plano
-        if (t > dist)
+        if (t > 0)
             ts.push_back({t, i});
     }
 
@@ -51,11 +51,11 @@ int main()
     cima = vec3(x, y, z);
 
     Camera cam(origem, alvo, cima);
-    int dist;
+    double dist;
     int resh;
     int resv;
 
-    cout << "Distancia (1 int): \n";
+    cout << "Distancia (1 double): \n";
     cin >> dist;
     cout << "Resolucao v (1 int): \n";
     cin >> resh;
