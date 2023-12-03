@@ -123,7 +123,7 @@ int main()
         for (int x = 0; x < resh; x++)
         {
             ray r(origem, canto_inf_esq + (x * qx) + (y * qy));
-            vec3 col = color(r, dist, objects);
+            vec3 col = color(r, objects);
             int ir = int(col.r());
             int ig = int(col.g());
             int ib = int(col.b());
