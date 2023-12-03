@@ -18,10 +18,15 @@ public:
         double c = dot(oc, oc) - (Radious * Radious);
         double delta = (b * b) - (4 * a * c);
         if (delta >= 0)
-            t = -b - sqrt(delta);
+        {
+            t = (-b - sqrt(delta)) / 2 * a;
+
+            if (t < 0)
+                t = (-b + sqrt(delta)) / 2 * a;
+        }
         else
             t = -1;
-        
+
         return t;
     }
 
