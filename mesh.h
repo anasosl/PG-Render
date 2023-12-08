@@ -37,14 +37,14 @@ public:
     point3 A, B, C;
     vec3 normal;
 
-    Triangle(point3 a, point3 b, point3 c)
+    Triangle(const point3 &a, const point3 &b, const point3 &c)
     {
         A = a;
         B = b;
         C = c;
 
-        vec3 AB = A - B;
-        vec3 AC = A - C;
+        vec3 AB = B - A;
+        vec3 AC = C - A;
 
         normal = cross(AB, AC);
     }
@@ -58,9 +58,9 @@ public:
         {
             point3 P = r.point_at(t);
             double ABC = 0.5 * (cross(B - A, C - A).length());
-            double PAB = 0.5 * (cross(P - A, P - B).length());
-            double PAC = 0.5 * (cross(P - A, P - C).length());
-            double PBC = 0.5 * (cross(P - B, P - C).length());
+            double PAB = 0.5 * (cross(A - P, B - P).length());
+            double PAC = 0.5 * (cross(A - P, C - P).length());
+            double PBC = 0.5 * (cross(B - P, C - P).length());
 
             double alfa = PAB / ABC;
             double beta = PAC / ABC;
@@ -92,7 +92,7 @@ public:
 
     vector<Triangle> triangles;
 
-    Mesh(int num_tri, int num_vert, vector<point3> vertices, vector<vector<int>> tri_vert, const vec3 &color)
+    Mesh(int num_tri, int num_vert, const vector<point3> &vertices, const vector<vector<int>> &tri_vert, const vec3 &color)
         : geometricObj(color)
     {
         for (int i = 0; i < num_tri; i++)
