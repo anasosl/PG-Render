@@ -70,14 +70,16 @@ int main()
     vec3 canto_inf_esq = dist * cam.w - tamx * cam.u - tamy * cam.v;
 
     vector<geometricObj *> objects;
-    vector<point3> sofia = {point3(5, 1, 0), point3(5, -1, 0), point3(5, 0, 1), point3(5, 1, 1)};
+    vector<point3> sofia = {point3(5, 0, 0), point3(5, 1, 0), point3(5, 0, 1), point3(5, 1, 1)};
     vector<vector<int>> pv(2);
-    pv[0].push_back(0);
-    pv[0].push_back(1);
     pv[0].push_back(2);
+    pv[0].push_back(0);
+    pv[0].push_back(3);
     pv[1].push_back(0);
-    pv[1].push_back(2);
+    pv[1].push_back(1);
     pv[1].push_back(3);
+
+
     vec3 rebeca = vec3(255, 255, 0);
     Mesh *mergulhao = new Mesh(2, 4, sofia, pv, rebeca);
     objects.push_back(mergulhao);
