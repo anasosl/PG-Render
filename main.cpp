@@ -5,6 +5,7 @@
 #include "plane.h"
 #include "geometricObj.h"
 #include "camera.h"
+#include "mesh.h"
 #include <bits/stdc++.h>
 using namespace std;
 
@@ -69,7 +70,14 @@ int main()
     vec3 canto_inf_esq = dist * cam.w - tamx * cam.u - tamy * cam.v;
 
     vector<geometricObj *> objects;
-
+    vector<point3> sofia = {point3(5, 1, 0), point3(5, -1, 0), point3(5, 0, -1)};
+    vector<vector<int>> pv;
+    pv[0].push_back(0);
+    pv[0].push_back(1);
+    pv[0].push_back(2);
+    vec3 rebeca = vec3(255, 255, 0);
+    Mesh *mergulhao = new Mesh(1, 3, sofia, pv, rebeca);
+    objects.push_back(mergulhao);
     cout << "\ndigite end para gerar a imagem | plane para adicionar um plano | sphere para adicionar uma esfera\n";
     while (true)
     {
