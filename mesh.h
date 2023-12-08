@@ -12,7 +12,6 @@
 #include "point3.h"
 #include "plane.h"
 
-typedef tuple<int, int, int> triple;
 
 using namespace std;
 
@@ -33,6 +32,11 @@ Calculado:
 class Triangle
 {
 public:
+
+    vector<point3> vertices;
+    point3 A, B, C;
+    vec3 normal;
+
     Triangle(point3 a, point3 b, point3 c)
     {
         A = a;
@@ -47,34 +51,33 @@ public:
 
     double intersect(const ray &r) const
     {
-        double t;
 
         plane plan = plane(A, normal, vec3(0, 0, 0));
         double t = plan.intersect(r);
-        point3 P = r.point_at(t);
+        if(t>0)
+        {
+            point3 P = r.point_at(t);
+            double ABC = 0.5 * (cross(B - A, C - A).length());
+            double PAB = 0.5 * (cross(P - A, P - B).length());
+            double PAC = 0.5 * (cross(P - A, P - C).length());
+            double PBC = 0.5 * (cross(P - B, P - C).length());
 
-        double ABC = 0.5 * (cross(B - A, C - A).length());
-        double PAB = 0.5 * (cross(P - A, P - B).length());
-        double PAC = 0.5 * (cross(P - A, P - C).length());
-        double PBC = 0.5 * (cross(P - B, P - C).length());
+            double alfa = PAB / ABC;
+            double beta = PAC / ABC;
+            double gama = PBC / ABC;
 
-        double alfa = PAB / ABC;
-        double beta = PAC / ABC;
-        double gama = PBC / ABC;
+            if (alfa < 0 || alfa > 1)
+                return -1;
+            if (beta < 0 || beta > 1)
+                return -1;
+            if (gama < 0 || gama > 1)
+                return -1;
 
-        if (alfa < 0 || alfa > 1)
-            return -1;
-        if (beta < 0 || beta > 1)
-            return -1;
-        if (gama < 0 || gama > 1)
-            return -1;
-
-        return t;
+            return t;
+        }
+        return -1;
     }
 
-    vector<point3> vertices;
-    point3 A, B, C;
-    vec3 normal;
 };
 
 class Mesh : public geometricObj
@@ -86,6 +89,9 @@ class Mesh : public geometricObj
         tri_vert = lista com triplas dos vértices
     */
 public:
+
+    vector<Triangle> triangles;
+
     Mesh(int num_tri, int num_vert, vector<point3> vertices, vector<vector<int>> tri_vert, const vec3 &color)
         : geometricObj(color)
     {
@@ -106,27 +112,24 @@ public:
     double intersect(const ray &r) const
     {
         double t;
-        priority_queue<double> queue_t;
+        priority_queue<double, vector<double>, greater<double> > queue_t;
         // testa interseção com todos os triângulos
         for (auto a : triangles)
         {
             t = a.intersect(r);
+            // t negativo significa que não tem interseção ou ela ocorreu atrás da câmera
+            if(t > 0)
             queue_t.push(t);
         }
 
-        // t negativo significa que não tem interseção ou ela ocorreu atrás da câmera
-        while (queue_t.top() < 0) 
-        {
-            queue_t.pop();
+        if(queue_t.size()>0)
+            return queue_t.top();
 
-            if (queue_t.empty())
-                return -1;
+        else{
+            return -1;
         }
-
-        return queue_t.top();
     }
 
-    vector<Triangle> triangles;
 };
 
 #endif
