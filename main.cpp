@@ -9,7 +9,7 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-vec3 color(const ray &r, vector<geometricObj *> &objects)
+vec3 calc_color(const ray &r, vector<geometricObj *> &objects)
 {
     vector<pair<double, int>> ts;
     for (long long unsigned int i = 0; i < objects.size(); i++)
@@ -70,19 +70,51 @@ int main()
     vec3 canto_inf_esq = dist * cam.w - tamx * cam.u - tamy * cam.v;
 
     vector<geometricObj *> objects;
-    vector<point3> lst_ver = {point3(5, 0, 0), point3(5, 1, 0), point3(5, 0, 1), point3(5, 1, 1)};
-    vector<vector<int>> lst_tri(2);
-    lst_tri[0].push_back(0);
-    lst_tri[0].push_back(1);
-    lst_tri[0].push_back(2);
-    lst_tri[1].push_back(1);
-    lst_tri[1].push_back(2);
-    lst_tri[1].push_back(3);
 
+    int qtd_tri, qtd_vert;
 
-    vec3 cor_tri = vec3(255, 255, 0);
-    Mesh *malha = new Mesh(2, 4, lst_ver, lst_tri, cor_tri);
-    objects.push_back(malha);
+    cout << "Quantidade de triangulos (1 int): " << endl;
+    cout << "Quantidade de vertices (1 int): " << endl;
+    cin >> qtd_tri >> qtd_vert;
+
+    vector<vector<int>> tri_vert(qtd_tri, vector<int>(3, 0));
+    vector<vec3> tri_colors(qtd_tri);
+    vector<point3> vertices(qtd_vert);
+    vector<Triangle> triangles(qtd_tri);
+
+    point3 vert;
+    for (int i = 0; i < qtd_vert; i++)
+    {
+        cout << "Vertice (3 doubles): " << endl;
+        cin >> vertices[i];
+    }
+
+    for (int i = 0; i < qtd_tri; i++)
+    {
+        cout << "Indices dos vertices do triangulo " << i << " (3 doubles): " << endl;
+        cin >> tri_vert[i][0];
+        cin >> tri_vert[i][1];
+        cin >> tri_vert[i][2];
+
+        cout << "Cor do triangulo " << i << " (3 doubles): " << endl;
+        cin >> x >> y >> z;
+        tri_colors[i];
+    }
+
+    for (int i = 0; i < qtd_tri; i++)
+    {
+        int idxA = tri_vert[i][0];
+        int idxB = tri_vert[i][1];
+        int idxC = tri_vert[i][2];
+
+        point3 A = vertices[idxA];
+        point3 B = vertices[idxB];
+        point3 C = vertices[idxC];
+
+        Triangle *tri = new Triangle(A, B, C, tri_colors[i]);
+        objects.push_back(tri);
+    }
+
     cout << "\ndigite end para gerar a imagem | plane para adicionar um plano | sphere para adicionar uma esfera\n";
     while (true)
     {
@@ -136,7 +168,7 @@ int main()
         for (int x = 0; x < resh; x++)
         {
             ray r(origem, canto_inf_esq + (x * qx) + (y * qy));
-            vec3 col = color(r, objects);
+            vec3 col = calc_color(r, objects);
             int ir = int(col.r());
             int ig = int(col.g());
             int ib = int(col.b());
