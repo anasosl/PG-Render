@@ -57,14 +57,20 @@ public:
         if(t>0)
         {
             point3 P = r.point_at(t);
-            double ABC = 0.5 * (cross(B - A, C - A).length());
-            double PAB = 0.5 * (cross(A - P, B - P).length());
-            double PAC = 0.5 * (cross(A - P, C - P).length());
-            double PBC = 0.5 * (cross(B - P, C - P).length());
+            vec3 v0 = B - A;
+            vec3 v1 = C - A;
+            vec3 v2 = P - A; 
+            double d00 = dot(v0, v0);
+            double d01 = dot(v0, v1);
+            double d11 = dot(v1, v1);
+            double d20 = dot(v2, v0);
+            double d21 = dot(v2, v1);
 
-            double alfa = PAB / ABC;
-            double beta = PAC / ABC;
-            double gama = PBC / ABC;
+            double denom = d00 * d11 - d01*d01;
+
+            double alfa = (d11*d20 - d01*d21)/denom;
+            double beta = (d00*d21 - d01*d20)/denom;
+            double gama = 1 - alfa - beta; 
 
             if (alfa < 0 || alfa > 1)
                 return -1;
@@ -72,7 +78,6 @@ public:
                 return -1;
             if (gama < 0 || gama > 1)
                 return -1;
-
             return t;
         }
         return -1;
