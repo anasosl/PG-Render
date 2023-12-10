@@ -31,7 +31,6 @@ Calculado:
 class Triangle : public geometricObj
 {
 public:
-    vector<point3> vertices;
     point3 A, B, C;
     vec3 normal;
 

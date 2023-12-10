@@ -77,28 +77,36 @@ int main()
     cout << "Quantidade de vertices (1 int): " << endl;
     cin >> qtd_tri >> qtd_vert;
 
-    vector<vector<int>> tri_vert(qtd_tri, vector<int>(3, 0));
+    vector<vector<int>> tri_vert(qtd_tri);
     vector<vec3> tri_colors(qtd_tri);
     vector<point3> vertices(qtd_vert);
     vector<Triangle> triangles(qtd_tri);
 
-    point3 vert;
     for (int i = 0; i < qtd_vert; i++)
     {
+        double x1, y1, z1;
         cout << "Vertice (3 doubles): " << endl;
-        cin >> vertices[i];
+        cin >> x1 >> y1 >> z1;
+        point3 v = point3(x1, y1, z1);
+        vertices[i] = v;
+
     }
 
     for (int i = 0; i < qtd_tri; i++)
     {
-        cout << "Indices dos vertices do triangulo " << i << " (3 doubles): " << endl;
-        cin >> tri_vert[i][0];
-        cin >> tri_vert[i][1];
-        cin >> tri_vert[i][2];
-
+        cout << "Indices dos vertices do triangulo " << i << " (3 int): " << endl;
+        int ind;
+        cin >> ind;
+        tri_vert[i].push_back(ind);
+        cin >> ind;
+        tri_vert[i].push_back(ind);
+        cin >> ind;
+        tri_vert[i].push_back(ind);
+        double x1, y1, z1;
         cout << "Cor do triangulo " << i << " (3 doubles): " << endl;
-        cin >> x >> y >> z;
-        tri_colors[i];
+        cin >> x1 >> y1 >> z1;
+        vec3 v2 = vec3(x1, y1, z1);
+        tri_colors[i] = v2;
     }
 
     for (int i = 0; i < qtd_tri; i++)
