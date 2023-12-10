@@ -5,6 +5,7 @@
 #include "plane.h"
 #include "geometricObj.h"
 #include "camera.h"
+#include "mesh.h"
 #include <bits/stdc++.h>
 using namespace std;
 
@@ -69,7 +70,32 @@ int main()
     vec3 canto_inf_esq = dist * cam.w - tamx * cam.u - tamy * cam.v;
 
     vector<geometricObj *> objects;
+    vector<point3> lst_ver = {point3(0, 0, 0), point3(1, 0, 0), point3(1, 0, 1), point3(0, 0, 1), point3(0.5, 0.5, 0.5)};
+    vector<vector<int>> lst_tri(6);
+    lst_tri[0].push_back(0);
+    lst_tri[0].push_back(1);
+    lst_tri[0].push_back(2);
+    lst_tri[1].push_back(1);
+    lst_tri[1].push_back(2);
+    lst_tri[1].push_back(3);
+    lst_tri[2].push_back(0);
+    lst_tri[2].push_back(1);
+    lst_tri[2].push_back(4);
+    lst_tri[3].push_back(0);
+    lst_tri[3].push_back(3);
+    lst_tri[3].push_back(4);
+    lst_tri[4].push_back(1);
+    lst_tri[4].push_back(2);
+    lst_tri[4].push_back(4);
+    lst_tri[5].push_back(2);
+    lst_tri[5].push_back(3);
+    lst_tri[5].push_back(4);
 
+
+
+    vec3 cor_tri = vec3(255, 255, 0);
+    Mesh *malha = new Mesh(6, 5, lst_ver, lst_tri, cor_tri);
+    objects.push_back(malha);
     cout << "\ndigite end para gerar a imagem | plane para adicionar um plano | sphere para adicionar uma esfera\n";
     while (true)
     {
