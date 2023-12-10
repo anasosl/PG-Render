@@ -8,7 +8,7 @@ public:
     sphere(const point3 &center, double radius, const vec3 &color)
         : geometricObj(color), Center(center), Radious(radius) {}
 
-    double intersect(const ray &r) const
+    double intersect(const ray &r)
     {
         double t;
 

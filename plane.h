@@ -8,7 +8,7 @@ public:
     plane(const point3 &planepoint, const vec3& normal, const vec3 &color)
         : geometricObj(color), Normal(normal), PP(planepoint) {}
 
-    double intersect(const ray &r) const
+    double intersect(const ray &r)
     {
         double t;
 

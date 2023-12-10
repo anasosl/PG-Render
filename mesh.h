@@ -12,7 +12,6 @@
 #include "point3.h"
 #include "plane.h"
 
-
 using namespace std;
 
 /*
@@ -32,13 +31,14 @@ Calculado:
 class Triangle
 {
 public:
-
-    vector<point3> vertices;
     point3 A, B, C;
     vec3 normal;
+    vec3 color;
 
-    Triangle(const point3 &a, const point3 &b, const point3 &c)
+    Triangle(point3 &a, point3 &b, point3 &c, vec3 &col)
     {
+        color = col;
+
         A = a;
         B = b;
         C = c;
@@ -49,12 +49,12 @@ public:
         normal = cross(AB, AC);
     }
 
-    double intersect(const ray &r) const
+    double intersect(const ray &r)
     {
 
         plane plan = plane(A, normal, vec3(0, 0, 0));
         double t = plan.intersect(r);
-        if(t>0)
+        if (t > 0)
         {
             point3 P = r.point_at(t);
             double ABC = 0.5 * (cross(B - A, C - A).length());
@@ -77,7 +77,6 @@ public:
         }
         return -1;
     }
-
 };
 
 class Mesh : public geometricObj
@@ -89,47 +88,86 @@ class Mesh : public geometricObj
         tri_vert = lista com triplas dos vértices
     */
 public:
-
     vector<Triangle> triangles;
 
-    Mesh(int num_tri, int num_vert, const vector<point3> &vertices, const vector<vector<int>> &tri_vert, const vec3 &color)
-        : geometricObj(color)
-    {
-        for (int i = 0; i < num_tri; i++)
-        {
-            int idxA = tri_vert[i][0];
-            int idxB = tri_vert[i][1];
-            int idxC = tri_vert[i][2];
+    Mesh(vector<Triangle> tri, vec3 &color) : geometricObj(color), triangles(tri) {}
 
-            point3 A = vertices[idxA];
-            point3 B = vertices[idxB];
-            point3 C = vertices[idxC];
-
-            triangles.push_back(Triangle(A, B, C));
-        }
-    }
-
-    double intersect(const ray &r) const
+    double intersect(const ray &r)
     {
         double t;
-        priority_queue<double, vector<double>, greater<double> > queue_t;
+        int idx = 0;
+        priority_queue<pair<double, int>, vector<pair<double, int>>, greater<pair<double, int>>> queue_t;
+
         // testa interseção com todos os triângulos
         for (auto a : triangles)
         {
             t = a.intersect(r);
             // t negativo significa que não tem interseção ou ela ocorreu atrás da câmera
-            if(t > 0)
-            queue_t.push(t);
+            if (t > 0)
+                queue_t.push({t, idx});
+
+            idx++;
         }
 
-        if(queue_t.size()>0)
-            return queue_t.top();
-
-        else{
+        if (queue_t.size() > 0)
+        {
+            setColor(triangles[queue_t.top().second].color);
+            return queue_t.top().first;
+        }
+        else
+        {
             return -1;
         }
     }
-
 };
+
+Mesh *build_mesh()
+{
+    int qtd_tri, qtd_vert;
+
+    cout << "Quantidade de triangulos (1 int): " << endl;
+    cout << "Quantidade de vertices (1 int): " << endl;
+    cin >> qtd_tri >> qtd_vert;
+
+    vector<vector<int>> tri_vert(qtd_tri, vector<int>(3, 0));
+    vector<vec3> color(qtd_tri);
+    vector<point3> vertices(qtd_vert);
+    vector<Triangle> triangles(qtd_tri);
+
+    point3 vert;
+    for (int i = 0; i < qtd_vert; i++)
+    {
+        cout << "Vertice (3 doubles): " << endl;
+        cin >> vertices[i];
+    }
+
+    for (int i = 0; i < qtd_tri; i++)
+    {
+        cout << "Indices dos vertices do triangulo " << i << " (3 doubles): " << endl;
+        cin >> tri_vert[i][0];
+        cin >> tri_vert[i][1];
+        cin >> tri_vert[i][2];
+
+        cout << "Cor do triangulo " << i << " (3 doubles): " << endl;
+        cin >> color[i];
+    }
+
+    for (int i = 0; i < qtd_tri; i++)
+    {
+        int idxA = tri_vert[i][0];
+        int idxB = tri_vert[i][1];
+        int idxC = tri_vert[i][2];
+
+        point3 A = vertices[idxA];
+        point3 B = vertices[idxB];
+        point3 C = vertices[idxC];
+
+        triangles[i] = Triangle(A, B, C, color[i]);
+    }
+
+    vec3 mesh_color = vec3(0, 0, 0);
+    Mesh *mesh = new Mesh(triangles, mesh_color);
+    return mesh;
+}
 
 #endif

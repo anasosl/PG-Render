@@ -6,12 +6,13 @@
 class geometricObj
 {
 public:
-    geometricObj(vec3 color) { Color = color; }
-
-    inline vec3 color() const { return Color; }
-    virtual double intersect(const ray &r) const = 0;
-
     vec3 Color;
+
+    geometricObj(vec3 col) : Color(col) {}
+
+    inline vec3 getColor() const { return Color; }
+    inline void setColor(vec3 col) { Color = col; }
+    virtual double intersect(const ray &r) = 0;
 };
 
 #endif
