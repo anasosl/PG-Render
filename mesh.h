@@ -57,20 +57,16 @@ public:
         if(t>0)
         {
             point3 P = r.point_at(t);
-            double ABC = 0.5 * (cross(B - A, C - A).length());
-            double PAB = 0.5 * (cross(A - P, B - P).length());
-            double PAC = 0.5 * (cross(A - P, C - P).length());
-            double PBC = 0.5 * (cross(B - P, C - P).length());
+            
+            vec3 PAB = cross(B - A, P - B);
+            vec3 PAC = cross(C - B, P - B);
+            vec3 PBC = cross(A - C, P - C);
 
-            double alfa = PAB / ABC;
-            double beta = PAC / ABC;
-            double gama = PBC / ABC;
-
-            if (alfa < 0 || alfa > 1)
+            if (dot(normal, PAB) < 0)
                 return -1;
-            if (beta < 0 || beta > 1)
+            if (dot(normal, PAC) < 0)
                 return -1;
-            if (gama < 0 || gama > 1)
+            if (dot(normal, PBC) < 0)
                 return -1;
 
             return t;
