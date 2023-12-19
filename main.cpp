@@ -7,15 +7,20 @@
 #include "camera.h"
 #include "mesh.h"
 #include <bits/stdc++.h>
+#include "transformation.cpp"
 using namespace std;
 
-vec3 color(const ray &r, vector<geometricObj *> &objects)
+vec3 color(const ray &r, vector<geometricObj *> &objects, map<int, vector<vector<double>>> &transf)
 {
     vector<pair<double, int>> ts;
     for (long long unsigned int i = 0; i < objects.size(); i++)
     {
         geometricObj *obj = objects[i];
-        double t = obj->intersect(r);
+        double t;
+        if (transf.count(i) > 0) {
+            ray r2 = ray(point_transformation(transf[i], r.origin()), vector_transformation(transf[i], r.direction()));
+            t = obj->intersect(r2);
+        } else t = obj->intersect(r);
         // a interseção só é válida se ocorrer depois do plano
         if (t > 0)
             ts.push_back({t, i});
@@ -70,8 +75,9 @@ int main()
     vec3 canto_inf_esq = dist * cam.w - tamx * cam.u - tamy * cam.v;
 
     vector<geometricObj *> objects;
+    map<int, vector<vector<double>>> transf;
 
-    cout << "\ndigite end para gerar a imagem | plane para adicionar um plano | sphere para adicionar uma esfera | mesh para uma malha de triangulos\n";
+    cout << "\ndigite end para gerar a imagem | plane para adicionar um plano | sphere para adicionar uma esfera | mesh para uma malha de triangulos | matrix para uma matriz de transformação afim\n";
     while (true)
     {
         string type = "";
@@ -150,6 +156,31 @@ int main()
             Mesh *malha = new Mesh(qtd_tri, qtd_vert, lst_vert, lst_tri, cor_tri);
             objects.push_back(malha);
         }
+        else if (type == "matrix") {
+            vector<vector<double>> inv_matrix(4, vector<double>(4,0));
+            vector<double> int_matrix(16);
+            vector<double> matrix(16);
+            for (int i = 0; i < 16; i++) {
+                cin >> matrix[i];
+            }
+
+            if (!InvertMatrix(matrix, int_matrix)) {
+                cout << "Matriz Invalida!\n";
+            } else {
+                for (int i = 0; i < 4; i++) {
+                    for (int j = 0; j < 4; j++) {
+                        inv_matrix[i][j] = int_matrix[i*4 + j];
+                    }
+                }
+                cout << "Para qual objeto voce deseja aplicar essa transformacao?\n";
+                int inx;
+                cin >> inx;
+                if (transf.count(inx) > 0) {
+                    transf[inx] = MatrixMultiplication(transf[inx], inv_matrix);
+                } else
+                transf[inx] = inv_matrix;
+            }
+        }
         else if (type == "end")
         {
             break;
@@ -164,7 +195,8 @@ int main()
         for (int x = 0; x < resh; x++)
         {
             ray r(origem, canto_inf_esq + (x * qx) + (y * qy));
-            vec3 col = color(r, objects);
+
+            vec3 col = color(r, objects, transf);
             int ir = int(col.r());
             int ig = int(col.g());
             int ib = int(col.b());
