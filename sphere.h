@@ -2,13 +2,17 @@
 #define SPHEREH
 #include "geometricObj.h"
 
+using namespace std;
+#include <iostream>
+
 class sphere : public geometricObj
 {
 public:
-    sphere(const point3 &center, double radius, const vec3 &color)
-        : geometricObj(color), Center(center), Radious(radius) {}
+    sphere(const point3 &center, double radius, 
+    const vec3 &color, vec3 Kd, vec3 Ks, vec3 Ka, vec3 Kr, vec3 Kt, double N)
+        : geometricObj(color, Kd, Ks, Ka, Kr, Kt, N), Center(center), Radious(radius) {}
 
-    double intersect(const ray &r) const
+    pair<double, vec3> intersect(const ray &r) const
     {
         double t;
 
@@ -27,7 +31,7 @@ public:
         else
             t = -1;
 
-        return t;
+        return {t, vec3((r.origin() + t*r.direction()) - Center)};
     }
 
     point3 Center;

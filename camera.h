@@ -4,15 +4,18 @@
 #include "point3.h"
 #include "vec3.h"
 
+using namespace std;
+#include <iostream>
+
 class Camera
 {
 public:
-    Camera(const point3 &orig, const point3 &al, const vec3 &cima)
+    Camera(const point3 &Origin, const point3 &Target, const vec3 &Up)
     {
-        origem = orig;
-        alvo = al;
-        up = cima;
-        w = alvo - origem;
+        origin = Origin;
+        target = Target;
+        up = Up;
+        w = target - origin;
         u = cross(w, up);
         v = cross(u, w);
         w.make_unit_vector();
@@ -20,8 +23,8 @@ public:
         v.make_unit_vector();
     }
 
-    point3 origem;
-    point3 alvo;
+    point3 origin;
+    point3 target;
     vec3 up;
     vec3 w;
     vec3 u;

@@ -6,6 +6,8 @@
 #include <iostream>
 #include "vec3.h"
 
+using namespace std;
+
 class point3 {
 public:
 	point3() {}
