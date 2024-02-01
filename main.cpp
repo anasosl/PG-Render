@@ -26,11 +26,15 @@ vec3 color(const ray &r, vector<geometricObj *> &objects, map<int, Matrix> &tran
 
         if (transf.count(i) > 0) {
             ray r2 = ray(point_transformation(transf[i], r.origin()), vector_transformation(transf[i], r.direction()));
-            auto [t, normal] = obj->intersect(r2);
+            t = obj->intersect(r2);
+            normal = obj->intNormal(r2, t);
 
             normal = vector_transformation(Transpose(transf[i]), normal);
 
-        } else auto [t, normal] = obj->intersect(r);
+        } else {
+            t = obj->intersect(r);
+            normal = obj->intNormal(r, t);
+        }
         
         // a interseção só é válida se ocorrer depois do plano
         if (t > 0) {
@@ -49,23 +53,29 @@ vec3 color(const ray &r, vector<geometricObj *> &objects, map<int, Matrix> &tran
     normal = normals[ts[0].second];
 
     vec3 objColor = objf->color;
+    //cout << objColor << " objcolor\n";
     vec3 ambient = vec3(100, 100, 100);
 
     point3 intPoint = r.origin() + ts[0].first*r.direction();
+    //cout << intPoint << " intpoint\n";
 
     normal.make_unit_vector();
 
     vec3 phongColor = (objf->ka*ambient);
+    //cout << phongColor << " phongcolor\n";
 
     for (light l : lights) {
         vec3 L = l.origin - intPoint;
         L.make_unit_vector();
+        //cout << L << " L\n";
 
         vec3 R = 2*normal*(dot(normal, L)) - L;
         R.make_unit_vector();
+        //cout << R << " R\n";
 
         vec3 V = camOrigin - intPoint;
         V.make_unit_vector();
+        //cout << V << " V\n";
 
         vec3 diffuseColor = l.color*objColor*objf->kd*(dot(normal, L));
         vec3 specularColor = l.color*objf->ks*pow(dot(R, V),objf->n);

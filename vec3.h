@@ -5,8 +5,6 @@
 #include <stdlib.h>
 #include <iostream>
 
-using namespace std;
-
 class vec3
 {
 public:

@@ -4,9 +4,6 @@
 #include "point3.h"
 #include "vec3.h"
 
-using namespace std;
-#include <iostream>
-
 class Camera
 {
 public:

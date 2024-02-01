@@ -12,18 +12,9 @@
 #include "point3.h"
 #include "plane.h"
 
-
 using namespace std;
 
-struct comp {
-    constexpr bool operator()(
-        pair<double, vec3> const& a,
-        pair<double, vec3> const& b)
-        const noexcept
-    {
-        return a.first > b.first;
-    }
-};
+vec3 triangleNormal;
 
 /*
 Input:
@@ -59,11 +50,11 @@ public:
         normal = cross(AB, AC);
     }
 
-    pair<double, vec3> intersect(const ray &r) const
+    double intersect(const ray &r) const
     {
 
         plane plan = plane(A, normal, vec3(0, 0, 0), vec3(0, 0, 0), vec3(0, 0, 0), vec3(0, 0, 0), vec3(0, 0, 0), vec3(0, 0, 0), 0);
-        auto [t, normal_int] = plan.intersect(r);
+        double t = plan.intersect(r);
         if(t>0)
         {
             point3 P = r.point_at(t);
@@ -73,17 +64,17 @@ public:
             vec3 PBC = cross(A - C, P - C);
 
             if (dot(normal, PAB) < 0 || dot(normal, PAC) < 0 || dot(normal, PBC) < 0)
-                return {-1, vec3(0,0,0)};
+                return -1;
 
-            vec3 normalIntersection = normal;
-
-            if (dot(r.direction(), normal) > 0) {
-                normalIntersection = vec3(-normal.x(), -normal.y(), -normal.z());
-            }
-
-            return {t, normalIntersection};
+                        return t;
         }
-        return {-1, vec3(0,0,0)};
+        return -1;
+    }
+
+    vec3 intNormal(const ray &r, double t) const {
+        if (dot(r.direction(), normal) > 0) {
+            return vec3(-normal.x(), -normal.y(), -normal.z());
+        } else return normal;
     }
 
 };
@@ -118,21 +109,30 @@ public:
         }
     }
 
-    pair<double, vec3> intersect(const ray &r) const
+    double intersect(const ray &r) const
     {
         double t;
-        priority_queue<pair<double, vec3>, vector<pair<double, vec3>>, comp> trianglesQueue;
+        double maxT = -1;
+        vec3 maxNormal;
         // testa interseção com todos os triângulos
         for (auto a : triangles)
         {
-            auto [t, normal] = a.intersect(r);
+            t = a.intersect(r);
             // t negativo significa que não tem interseção ou ela ocorreu atrás da câmera
-            if(t > 0) trianglesQueue.push({t, normal});
+            if(t > 0 && t > maxT){
+                maxT = t;
+                maxNormal = a.intNormal(r, t);
+            }
         }
 
-        if(trianglesQueue.size()>0) return trianglesQueue.top();
-        else return {-1, vec3(0,0,0)};
+        triangleNormal = maxNormal;
+
+        return maxT;
         
+    }
+
+    vec3 intNormal(const ray &r, double t) const {
+        return triangleNormal;
     }
 
 };

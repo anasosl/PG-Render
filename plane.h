@@ -2,9 +2,6 @@
 #define PLANEH
 #include "geometricObj.h"
 
-using namespace std;
-#include <iostream>
-
 class plane : public geometricObj
 {
 public:
@@ -12,7 +9,7 @@ public:
     const vec3 &color, vec3 Kd, vec3 Ks, vec3 Ka, vec3 Kr, vec3 Kt, double N)
         : geometricObj(color, Kd, Ks, Ka, Kr, Kt, N), Normal(normal), PP(planepoint) {}
 
-    pair<double, vec3> intersect(const ray &r) const
+    double intersect(const ray &r) const
     {
         double t;
 
@@ -26,14 +23,15 @@ public:
         if (c != 0) {
             t = (a - b) / c;
         }
-        vec3 norm = Normal;
+            
+    
+        return t;
+    }
 
+    vec3 intNormal(const ray &r, double t) const {
         if (dot(r.direction(), Normal) > 0) {
-            norm = vec3(-Normal.x(), -Normal.y(), -Normal.z());
-        }
-    
-    
-        return {t, norm};
+            return vec3(-Normal.x(), -Normal.y(), -Normal.z());
+        } else return Normal;
     }
 
     point3 PP;
