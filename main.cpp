@@ -13,6 +13,9 @@
 typedef vector<vector<double>> Matrix;
 using namespace std;
 
+#define PHONG vec3(0.5, 0.5, 0.5), vec3(0.5, 0.5, 0.5), vec3(0.5, 0.5, 0.5), vec3(0, 0, 0), vec3(0, 0, 0), 5
+#define AMBIENT vec3(0, 0, 0)
+
 vec3 color(const ray &r, vector<geometricObj *> &objects, map<int, Matrix> &transf, vector<light> &lights, point3 camOrigin)
 {
     vector<pair<double, int>> ts;
@@ -54,7 +57,7 @@ vec3 color(const ray &r, vector<geometricObj *> &objects, map<int, Matrix> &tran
 
     vec3 objColor = objf->color;
     //cout << objColor << " objcolor\n";
-    vec3 ambient = vec3(100, 100, 100);
+    vec3 ambient = AMBIENT;
 
     point3 intPoint = r.origin() + ts[0].first*r.direction();
     //cout << intPoint << " intpoint\n";
@@ -77,16 +80,16 @@ vec3 color(const ray &r, vector<geometricObj *> &objects, map<int, Matrix> &tran
         V.make_unit_vector();
         //cout << V << " V\n";
 
-        vec3 diffuseColor = l.color*objColor*objf->kd*(dot(normal, L));
-        vec3 specularColor = l.color*objf->ks*pow(dot(R, V),objf->n);
+        vec3 diffuseColor = l.color*objColor*objf->kd*max(dot(normal, L), 0.0);
+        vec3 specularColor = l.color*objf->ks*pow(max(dot(R, V), 0.0),objf->n);
 
         phongColor += diffuseColor + specularColor;
     }
 
-    if (phongColor.x() > 255) phongColor = vec3(255, phongColor.y(), phongColor.z());
-    if (phongColor.y() > 255) phongColor = vec3(phongColor.x(), 255, phongColor.z());
-    if (phongColor.z() > 255) phongColor = vec3(phongColor.x(), phongColor.y(), 255);
+    phongColor = vec3(min(phongColor.r(), 255.0), min(phongColor.g(), 255.0), min(phongColor.b(), 255.0));
+
     return phongColor;
+    //return objColor;
 }
 
 int main()
@@ -154,7 +157,7 @@ int main()
             cout << "Cor (3 doubles): \n";
             cin >> x >> y >> z;
             v1 = vec3(x, y, z);
-            sphere *sp = new sphere(p, r, v1, vec3(0.45, 0.45, 0.45), vec3(0.5, 0.5, 0.5), vec3(0.5, 0.5, 0.5), vec3(0, 0, 0), vec3(0, 0, 0), 3);
+            sphere *sp = new sphere(p, r, v1, PHONG);
             objects.push_back(sp);
         }
         else if (type == "plane")
@@ -168,7 +171,7 @@ int main()
             cout << "Cor (3 doubles): \n";
             cin >> x >> y >> z;
             v2 = vec3(x, y, z);
-            plane *pl = new plane(p, v1, v2, vec3(0.45, 0.45, 0.45), vec3(0.5, 0.5, 0.5), vec3(0, 0, 0), vec3(0, 0, 0), vec3(0, 0, 0), 3);
+            plane *pl = new plane(p, v1, v2, PHONG);
             objects.push_back(pl);
         }
         else if (type == "mesh")
@@ -208,7 +211,7 @@ int main()
             cin >> r >> g >> b;
             vec3 triangleColor = vec3(r, g, b);
 
-            Mesh *malha = new Mesh(numTriangles, numVertices, listVertices, listTriangles, triangleColor, vec3(0.45, 0.45, 0.45), vec3(0.5, 0.5, 0.5), vec3(0, 0, 0), vec3(0, 0, 0), vec3(0, 0, 0), 3);
+            Mesh *malha = new Mesh(numTriangles, numVertices, listVertices, listTriangles, triangleColor, PHONG);
             objects.push_back(malha);
             
         }
