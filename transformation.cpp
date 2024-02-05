@@ -170,15 +170,12 @@ bool InvertMatrix(vector<double> &m, vector<double> &invOut)
     return true;
 }
 
-Matrix Transpose(Matrix &A) {
-    Matrix AT(4, vector<double> (4));
+void Transpose(Matrix &A, Matrix &B) {
     
     for (int i = 0; i < 4; i++) {
         for (int j = 0; j < 4; j++) {
-            AT[j][i] = A[i][j];
+            B[j][i] = A[i][j];
         }
     }
-
-    return AT;
 }
 
