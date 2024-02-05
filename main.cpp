@@ -13,7 +13,7 @@
 typedef vector<vector<double>> Matrix;
 using namespace std;
 
-#define PHONG vec3(0.5, 0.5, 0.5), vec3(0.5, 0.5, 0.5), vec3(0.5, 0.5, 0.5), vec3(0, 0, 0), vec3(0, 0, 0), 5
+#define PHONG vec3(1, 1, 1), vec3(1, 1, 1), vec3(0.2, 0.2, 0.2), vec3(0, 0, 0), vec3(0, 0, 0), 5
 
 vec3 color(const ray &r, vector<geometricObj *> &objects, map<int, Matrix> &transf, vector<light> &lights, point3 camOrigin)
 {
@@ -31,7 +31,10 @@ vec3 color(const ray &r, vector<geometricObj *> &objects, map<int, Matrix> &tran
             t = obj->intersect(r2);
             normal = obj->intNormal(r2, t);
 
-            normal = vector_transformation(Transpose(transf[i]), normal);
+            Matrix transp(4, vector<double> (4));
+            Transpose(transf[i], transp);
+
+            normal = vector_transformation(transp, normal);
 
         } else {
             t = obj->intersect(r);
@@ -56,7 +59,7 @@ vec3 color(const ray &r, vector<geometricObj *> &objects, map<int, Matrix> &tran
 
     vec3 objColor = objf->color;
     //cout << objColor << " objcolor\n";
-    vec3 ambient = objColor;
+    vec3 ambient = vec3(255,255,255);
 
     point3 intPoint = r.origin() + ts[0].first*r.direction();
     //cout << intPoint << " intpoint\n";
@@ -82,10 +85,10 @@ vec3 color(const ray &r, vector<geometricObj *> &objects, map<int, Matrix> &tran
         double cosDiffuse = dot(normal,L);
 
         if (cosDiffuse > 0) {
-            vec3 diffuseColor = l.color*objf->kd*cosDiffuse;
-            vec3 specularColor = l.color*objf->ks*pow(max(dot(R, V), 0.0),objf->n);
+            vec3 diffuseColor = l.color * objColor * objf->kd * cosDiffuse;
+            vec3 specularColor = l.color * objf->ks * pow(max(dot(R, V), 0.0),objf->n);
 
-            phongColor += diffuseColor + specularColor;
+            phongColor += diffuseColor;
         }
 
         
@@ -246,28 +249,31 @@ int main()
                 cout << "Digite os parametros de translacao dx, dy e dz (3 doubles)\n";
                 double dx, dy, dz;
                 cin >> dx >> dy >> dz;
-                Matrix finalMatrix = {{1,0,0,-dx},{0,1,0,-dy},{0,0,1,-dz},{0,0,0,1}};
+                finalMatrix = {{1,0,0,-dx},{0,1,0,-dy},{0,0,1,-dz},{0,0,0,1}};
 
             } else if (type == "rotacao") {
                 cout << "Em qual eixo deseja rotacionar? Digite x, y ou z (string)\n";
                 cout << "Qual ângulo de rotacao? Digite em graus (double)\n";
                 string axis; cin >> axis;
                 double degree; cin >> degree;
-                degree = degree*((355/113)/180);
+                double pi = 355.0/113.0;
+                double rad = pi / 180.0;
+                degree = degree*(rad);
 
                 if (axis == "x") {
-                    Matrix finalMatrix = {{1,0,0,0},{0,cos(degree),sin(degree),0},{0,-sin(degree),cos(degree),0},{0,0,0,1}};
+                    finalMatrix = {{1,0,0,0},{0,cos(degree),sin(degree),0},{0,-sin(degree),cos(degree),0},{0,0,0,1}};
                 } else if (axis == "y") {
-                    Matrix finalMatrix = {{cos(degree), 0, -sin(degree), 0},{0,1,0,0},{sin(degree),0,cos(degree),0},{0,0,0,1}};
+                    finalMatrix = {{cos(degree), 0, -sin(degree), 0},{0,1,0,0},{sin(degree),0,cos(degree),0},{0,0,0,1}};
                 } else if (axis == "z") {
-                    Matrix finalMatrix = {{cos(degree),sin(degree),0,0},{-sin(degree),cos(degree),0,0},{0,0,1,0},{0,0,0,1}};
+                    finalMatrix = {{cos(degree),sin(degree),0,0},{-sin(degree),cos(degree),0,0},{0,0,1,0},{0,0,0,1}};
                 }
                 
             } else if (type == "escalar") {
                 cout << "Digite os parametros a,b,c (3 doubles)\n";
                 double a,b,c;
                 cin >> a >> b >> c;
-                Matrix finalMatrix = {{1/a, 0, 0, 0},{0,1/b, 0, 0},{0,0,1/c, 0},{0,0,0,1}};
+                finalMatrix = {{1/a, 0, 0, 0},{0,1/b, 0, 0},{0,0,1/c, 0},{0,0,0,1}};
+
             }
 
                 cout << "Para qual objeto voce deseja aplicar essa transformacao?\n";
