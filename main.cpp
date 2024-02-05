@@ -88,7 +88,7 @@ vec3 color(const ray &r, vector<geometricObj *> &objects, map<int, Matrix> &tran
             vec3 diffuseColor = l.color * objColor * objf->kd * cosDiffuse;
             vec3 specularColor = l.color * objf->ks * pow(max(dot(R, V), 0.0),objf->n);
 
-            phongColor += diffuseColor;
+            phongColor += diffuseColor + specularColor;
         }
 
         
