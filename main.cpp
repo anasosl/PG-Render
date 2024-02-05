@@ -66,7 +66,7 @@ vec3 color(const ray &r, vector<geometricObj *> &objects, map<int, Matrix> &tran
 
     normal.make_unit_vector();
 
-    vec3 phongColor = (objf->ka*ambient);
+    vec3 phongColor = ambient*objf->ka;
     //cout << phongColor << " phongcolor\n";
 
     for (light l : lights) {
@@ -85,12 +85,29 @@ vec3 color(const ray &r, vector<geometricObj *> &objects, map<int, Matrix> &tran
         double cosDiffuse = dot(normal,L);
 
         if (cosDiffuse > 0) {
-            vec3 diffuseColor = l.color * objColor * objf->kd * cosDiffuse;
+            vec3 diffuseColor = l.color * objf->kd * cosDiffuse;
             vec3 specularColor = l.color * objf->ks * pow(max(dot(R, V), 0.0),objf->n);
 
-            phongColor += diffuseColor + specularColor;
-        }
+            phongColor += diffuseColor*objColor + specularColor;
+        } //else phongColor *= vec3(objColor.r()/255, objColor.g()/255, objColor.b()/255);
 
+
+    /*
+    0 0 0
+    1 0 0
+    0 1 0
+    1
+    400
+    400
+    sphere
+    5 0 0
+    1.5
+    255 0 0
+    light
+    5 5 0
+    255 255 255
+    end
+    */
         
     }
 
