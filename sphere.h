@@ -6,7 +6,7 @@ class sphere : public geometricObj
 {
 public:
     sphere(const point3 &center, double radius, 
-    const vec3 &color, vec3 Kd, vec3 Ks, vec3 Ka, vec3 Kr, vec3 Kt, double N)
+    const vec3 &color, double Kd, double Ks, double Ka, double Kr, double Kt, double N)
         : geometricObj(color, Kd, Ks, Ka, Kr, Kt, N), Center(center), Radious(radius) {}
 
     double intersect(const ray &r) const
@@ -31,7 +31,8 @@ public:
         return t;
     }
     vec3 intNormal(const ray &r, double t) const {
-        return (r.origin() + t*r.direction()) - Center;
+        vec3 norm = (r.origin() + t*r.direction()) - (Center);
+        return norm;
     }
 
     point3 Center;

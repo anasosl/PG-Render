@@ -6,7 +6,7 @@ class plane : public geometricObj
 {
 public:
     plane(const point3 &planepoint, const vec3& normal, 
-    const vec3 &color, vec3 Kd, vec3 Ks, vec3 Ka, vec3 Kr, vec3 Kt, double N)
+    const vec3 &color, double Kd, double Ks, double Ka, double Kr, double Kt, double N)
         : geometricObj(color, Kd, Ks, Ka, Kr, Kt, N), Normal(normal), PP(planepoint) {}
 
     double intersect(const ray &r) const

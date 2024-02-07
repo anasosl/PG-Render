@@ -53,7 +53,7 @@ public:
     double intersect(const ray &r) const
     {
 
-        plane plan = plane(A, normal, vec3(0, 0, 0), vec3(0, 0, 0), vec3(0, 0, 0), vec3(0, 0, 0), vec3(0, 0, 0), vec3(0, 0, 0), 0);
+        plane plan = plane(A, normal, vec3(0,0,0), 0, 0, 0, 0, 0, 0);
         double t = plan.intersect(r);
         if(t>0)
         {
@@ -92,7 +92,7 @@ public:
     vector<Triangle> triangles;
 
     Mesh(int numTriangles, int numVertices, const vector<point3> &vertices, const vector<vector<int>> &triangleVertices, 
-    const vec3 &color, vec3 Kd, vec3 Ks, vec3 Ka, vec3 Kr, vec3 Kt, double N)
+    const vec3 &color, double Kd, double Ks, double Ka, double Kr, double Kt, double N)
         : geometricObj(color, Kd, Ks, Ka, Kr, Kt, N)
     {
         for (int i = 0; i < numTriangles; i++)

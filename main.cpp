@@ -13,7 +13,7 @@
 typedef vector<vector<double>> Matrix;
 using namespace std;
 
-#define PHONG vec3(1, 1, 1), vec3(1, 1, 1), vec3(0.2, 0.2, 0.2), vec3(0, 0, 0), vec3(0, 0, 0), 5
+#define PHONG 0.5, 0.5, 0.2, 0, 0, 5
 
 vec3 color(const ray &r, vector<geometricObj *> &objects, map<int, Matrix> &transf, vector<light> &lights, point3 camOrigin)
 {
@@ -89,7 +89,7 @@ vec3 color(const ray &r, vector<geometricObj *> &objects, map<int, Matrix> &tran
             vec3 specularColor = l.color * objf->ks * pow(max(dot(R, V), 0.0),objf->n);
 
             phongColor += diffuseColor*objColor + specularColor;
-        } //else phongColor *= vec3(objColor.r()/255, objColor.g()/255, objColor.b()/255);
+        } else phongColor *= vec3(objColor.r()/255, objColor.g()/255, objColor.b()/255);
 
 
     /*
