@@ -31,8 +31,7 @@ public:
         return t;
     }
     vec3 intNormal(const ray &r, double t) const {
-        vec3 norm = (r.origin() + t*r.direction()) - (Center);
-        return norm;
+        return (r.origin() + t*r.direction()) - Center;
     }
 
     point3 Center;

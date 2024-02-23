@@ -178,4 +178,3 @@ void Transpose(Matrix &A, Matrix &B) {
         }
     }
 }
-

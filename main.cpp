@@ -13,7 +13,7 @@
 typedef vector<vector<double>> Matrix;
 using namespace std;
 
-#define PHONG 0.5, 0.5, 0.2, 0, 0, 5
+#define PHONG 0.5, 0.5, 0.2, 0.0, 0.0, 5.0
 
 vec3 color(const ray &r, vector<geometricObj *> &objects, map<int, Matrix> &transf, vector<light> &lights, point3 camOrigin)
 {
@@ -31,7 +31,8 @@ vec3 color(const ray &r, vector<geometricObj *> &objects, map<int, Matrix> &tran
             t = obj->intersect(r2);
             normal = obj->intNormal(r2, t);
 
-            Matrix transp(4, vector<double> (4));
+            vector<double> a(4);
+            Matrix transp(4, a);
             Transpose(transf[i], transp);
 
             normal = vector_transformation(transp, normal);
@@ -58,29 +59,25 @@ vec3 color(const ray &r, vector<geometricObj *> &objects, map<int, Matrix> &tran
     normal = normals[ts[0].second];
 
     vec3 objColor = objf->color;
-    //cout << objColor << " objcolor\n";
-    vec3 ambient = vec3(255,255,255);
+
+    //vec3 ambient = vec3(255,255,255);
+    vec3 ambient = objColor;
 
     point3 intPoint = r.origin() + ts[0].first*r.direction();
-    //cout << intPoint << " intpoint\n";
 
     normal.make_unit_vector();
 
     vec3 phongColor = ambient*objf->ka;
-    //cout << phongColor << " phongcolor\n";
 
     for (light l : lights) {
         vec3 L = l.origin - intPoint;
         L.make_unit_vector();
-        //cout << L << " L\n";
 
         vec3 R = 2*normal*(dot(normal, L)) - L;
         R.make_unit_vector();
-        //cout << R << " R\n";
 
         vec3 V = camOrigin - intPoint;
         V.make_unit_vector();
-        //cout << V << " V\n";
 
         double cosDiffuse = dot(normal,L);
 
@@ -88,9 +85,11 @@ vec3 color(const ray &r, vector<geometricObj *> &objects, map<int, Matrix> &tran
             vec3 diffuseColor = l.color * objf->kd * cosDiffuse;
             vec3 specularColor = l.color * objf->ks * pow(max(dot(R, V), 0.0),objf->n);
 
-            phongColor += diffuseColor*objColor + specularColor;
-        } else phongColor *= vec3(objColor.r()/255, objColor.g()/255, objColor.b()/255);
+            //phongColor += diffuseColor*objColor + specularColor;
+            phongColor += diffuseColor + specularColor;
+        } //else phongColor *= vec3(objColor.r()/255, objColor.g()/255, objColor.b()/255);
 
+    }
 
     /*
     0 0 0
@@ -108,8 +107,10 @@ vec3 color(const ray &r, vector<geometricObj *> &objects, map<int, Matrix> &tran
     255 255 255
     end
     */
+
+   
         
-    }
+    
 
     phongColor = vec3(min(phongColor.r(), 255.0), min(phongColor.g(), 255.0), min(phongColor.b(), 255.0));
 

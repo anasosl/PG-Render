@@ -53,7 +53,7 @@ public:
     double intersect(const ray &r) const
     {
 
-        plane plan = plane(A, normal, vec3(0,0,0), 0, 0, 0, 0, 0, 0);
+        plane plan = plane(A, normal, vec3(0,0,0), 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
         double t = plan.intersect(r);
         if(t>0)
         {
