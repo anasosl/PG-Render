@@ -271,8 +271,8 @@ int main()
 
             } else if (type == "rotacao") {
                 cout << "Em qual eixo deseja rotacionar? Digite x, y ou z (string)\n";
-                cout << "Qual ângulo de rotacao? Digite em graus (double)\n";
                 string axis; cin >> axis;
+                cout << "Qual ângulo de rotacao? Digite em graus (double)\n";
                 double degree; cin >> degree;
                 double pi = 355.0/113.0;
                 double rad = pi / 180.0;

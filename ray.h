@@ -16,6 +16,7 @@ public:
     {
         P = p;
         D = d;
+        D.make_unit_vector();
     }
     point3 origin() const { return P; }
     vec3 direction() const { return D; }
