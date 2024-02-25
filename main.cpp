@@ -13,8 +13,9 @@
 typedef vector<vector<double>> Matrix;
 using namespace std;
 
-#define PHONG 0.5, 0.5, 0.2, 0.5, 0.5, 5.0
+#define PHONG 0.5, 0.5, 0.2, 0.5, 0.5, 1.0
 #define REF_INDEX 1.5
+#define epsilon 0.01
 
 vec3 color(const ray &r, vector<geometricObj *> &objects, map<int, Matrix> &transf, vector<light> &lights, point3 camOrigin, int rec, int rec2)
 {
@@ -46,7 +47,7 @@ vec3 color(const ray &r, vector<geometricObj *> &objects, map<int, Matrix> &tran
         }
 
         // a interseção só é válida se ocorrer depois do plano
-        if (t > 0)
+        if (t > epsilon)
         {
             ts.push_back({t, i});
             normals[i] = normal;
@@ -64,8 +65,8 @@ vec3 color(const ray &r, vector<geometricObj *> &objects, map<int, Matrix> &tran
 
     vec3 objColor = objf->color;
 
-    // vec3 ambient = vec3(255,255,255);
-    vec3 ambient = objColor;
+    vec3 ambient = vec3(0,0,0);
+    // vec3 ambient = objColor;
 
     point3 intPoint = r.origin() + ts[0].first * r.direction();
 
@@ -93,8 +94,8 @@ vec3 color(const ray &r, vector<geometricObj *> &objects, map<int, Matrix> &tran
             vec3 diffuseColor = l.color * objf->kd * cosDiffuse;
             vec3 specularColor = l.color * objf->ks * pow(max(dot(R, V), 0.0), objf->n);
 
-            // phongColor += diffuseColor*objColor + specularColor;
-            phongColor += diffuseColor + specularColor;
+            phongColor += diffuseColor * vec3(objColor.r()/255, objColor.g()/255, objColor.b()/255) + specularColor;
+            // phongColor += diffuseColor + specularColor;
             if (rec < 4)
                 phongColor += objf->kr * color(ray(intPoint, R2), objects, transf, lights, camOrigin, rec + 1, rec2);
         } // else phongColor *= vec3(objColor.r()/255, objColor.g()/255, objColor.b()/255);
