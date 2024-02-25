@@ -13,7 +13,7 @@
 typedef vector<vector<double>> Matrix;
 using namespace std;
 
-#define PHONG 0.5, 0.5, 0.2, 0.0, 0.5, 5.0
+#define PHONG 0.5, 0.5, 0.2, 0.5, 0.5, 5.0
 #define REF_INDEX 1.5
 
 vec3 color(const ray &r, vector<geometricObj *> &objects, map<int, Matrix> &transf, vector<light> &lights, point3 camOrigin, int rec, int rec2)
@@ -27,7 +27,8 @@ vec3 color(const ray &r, vector<geometricObj *> &objects, map<int, Matrix> &tran
         geometricObj *obj = objects[i];
         double t;
 
-        if (transf.count(i) > 0) {
+        if (transf.count(i) > 0)
+        {
             ray r2 = ray(point_transformation(transf[i], r.origin()), vector_transformation(transf[i], r.direction()));
             t = obj->intersect(r2);
             normal = obj->intNormal(r2, t);
@@ -37,14 +38,16 @@ vec3 color(const ray &r, vector<geometricObj *> &objects, map<int, Matrix> &tran
             Transpose(transf[i], transp);
 
             normal = vector_transformation(transp, normal);
-
-        } else {
+        }
+        else
+        {
             t = obj->intersect(r);
             normal = obj->intNormal(r, t);
         }
-        
+
         // a interseção só é válida se ocorrer depois do plano
-        if (t > 0) {
+        if (t > 0)
+        {
             ts.push_back({t, i});
             normals[i] = normal;
         }
@@ -61,47 +64,48 @@ vec3 color(const ray &r, vector<geometricObj *> &objects, map<int, Matrix> &tran
 
     vec3 objColor = objf->color;
 
-    //vec3 ambient = vec3(255,255,255);
+    // vec3 ambient = vec3(255,255,255);
     vec3 ambient = objColor;
 
-    point3 intPoint = r.origin() + ts[0].first*r.direction();
+    point3 intPoint = r.origin() + ts[0].first * r.direction();
 
     normal.make_unit_vector();
 
-    vec3 phongColor = ambient*objf->ka;
+    vec3 phongColor = ambient * objf->ka;
 
-    for (light l : lights) {
+    for (light l : lights)
+    {
         vec3 L = l.origin - intPoint;
         L.make_unit_vector();
 
-        vec3 R = 2*normal*(dot(normal, L)) - L;
+        vec3 R = 2 * normal * (dot(normal, L)) - L;
         R.make_unit_vector();
 
         vec3 V = camOrigin - intPoint;
         V.make_unit_vector();
 
-        double cosDiffuse = dot(normal,L);
+        vec3 R2 = 2 * normal * (dot(normal, V)) - V;
 
-        if (cosDiffuse > 0) {
+        double cosDiffuse = dot(normal, L);
+
+        if (cosDiffuse > 0)
+        {
             vec3 diffuseColor = l.color * objf->kd * cosDiffuse;
-            vec3 specularColor = l.color * objf->ks * pow(max(dot(R, V), 0.0),objf->n);
+            vec3 specularColor = l.color * objf->ks * pow(max(dot(R, V), 0.0), objf->n);
 
-            //phongColor += diffuseColor*objColor + specularColor;
+            // phongColor += diffuseColor*objColor + specularColor;
             phongColor += diffuseColor + specularColor;
-            if (rec < 4) phongColor += objf->kr*color(ray(intPoint, R), objects, transf, lights, camOrigin, rec+1, rec2);
-        } //else phongColor *= vec3(objColor.r()/255, objColor.g()/255, objColor.b()/255);
+            if (rec < 4)
+                phongColor += objf->kr * color(ray(intPoint, R2), objects, transf, lights, camOrigin, rec + 1, rec2);
+        } // else phongColor *= vec3(objColor.r()/255, objColor.g()/255, objColor.b()/255);
 
-        double cos1 = dot(normal,V);
-        double sen1 = sqrt(1-cos1*cos1);
-        double n = 1/REF_INDEX;
+        double n = 1 / REF_INDEX;
 
-        double sen2 = sen1 / n;
-        double cos2 = sqrt(1 - sen2*sen2);
-        vec3 T = (1/n)*V - (cos2 - (1/n)*cos1)*normal;
+        // double sen2 = sen1 / n;
+        vec3 T = (n * cosDiffuse - sqrt(1 - (n * n) * (1 - cosDiffuse * cosDiffuse))) * normal - n * L;
 
-        if (rec2 < 4) phongColor += objf->kt*color(ray(intPoint, T), objects, transf, lights, camOrigin, rec, rec2+1);
-
-
+        if (rec2 < 4)
+            phongColor += objf->kt * color(ray(intPoint, T), objects, transf, lights, camOrigin, rec, rec2 + 1);
     }
 
     /*
@@ -121,31 +125,54 @@ vec3 color(const ray &r, vector<geometricObj *> &objects, map<int, Matrix> &tran
     end
     */
 
-   /*
-    0 0 0
-    1 0 0
-    0 1 0
-    1
-    400
-    400
-    sphere
-    5 2 0
-    1.5
-    255 0 0
-    light
-    5 0 4
-    255 255 255
-    sphere
-    5 -2 0
-    1.5
-    0 255 0
-    end
-    */
+    /*
+     0 0 0
+     1 0 0
+     0 1 0
+     1
+     400
+     400
+     sphere
+     5 0 0
+     1.5
+     255 0 0
+     sphere
+     15 0 0
+     6
+     0 0 255
+     light
+     0 0 3
+     255 255 255
+     sphere
+     5 -4 0
+     1.5
+     0 255 0
+     end
+
+     0 0 0
+     1 0 0
+     0 1 0
+     1
+     400
+     400
+     sphere
+     5 0 0
+     1.5
+     255 0 0
+     light
+     20 0 0
+     255 255 255
+     sphere
+     15 0 0
+     1.5
+     0 255 0
+     end
+     */
 
     phongColor = vec3(min(phongColor.r(), 255.0), min(phongColor.g(), 255.0), min(phongColor.b(), 255.0));
 
     return phongColor;
-    //return objColor;
+    // return objColor;
 }
 
 int main()
@@ -238,11 +265,11 @@ int main()
             cin >> numTriangles;
             cout << "Quantidade de vertices (1 int): \n";
             cin >> numVertices;
-            
+
             vector<point3> listVertices(numVertices);
             vector<vector<int>> listTriangles(numTriangles);
 
-            for(int i=0; i<numVertices; i++)
+            for (int i = 0; i < numVertices; i++)
             {
                 double x, y, z;
                 cout << "Vertice " << i << " (3 doubles): \n";
@@ -250,7 +277,7 @@ int main()
                 listVertices[i] = point3(x, y, z);
             }
 
-            for(int i=0; i<numTriangles; i++)
+            for (int i = 0; i < numTriangles; i++)
             {
                 int a, b, c;
                 cout << "Indices dos vertices do triangulo " << i << " (3 ints): \n";
@@ -269,82 +296,102 @@ int main()
 
             Mesh *malha = new Mesh(numTriangles, numVertices, listVertices, listTriangles, triangleColor, PHONG);
             objects.push_back(malha);
-            
         }
-        else if (type == "matrix") {
+        else if (type == "matrix")
+        {
             cout << "Digite: 'especifica' para inserir matrix especifica; digite 'translacao', 'rotacao', 'escalar', para inserir uma dessas\n";
-            string type; cin >> type;
-            Matrix finalMatrix(4, vector<double>(4,0));
+            string type;
+            cin >> type;
+            Matrix finalMatrix(4, vector<double>(4, 0));
 
-            if (type == "especifica") {
+            if (type == "especifica")
+            {
                 vector<double> intermediateMatrix(16);
                 vector<double> matrix(16);
                 cout << "Insira a Matriz Direta 4x4 (16 doubles):\n";
-                for (int i = 0; i < 16; i++) {
+                for (int i = 0; i < 16; i++)
+                {
                     cin >> matrix[i];
                 }
 
-                if (!InvertMatrix(matrix, intermediateMatrix)) {
+                if (!InvertMatrix(matrix, intermediateMatrix))
+                {
                     cout << "Matriz Invalida!\n";
-                } else {
-                    for (int i = 0; i < 4; i++) {
-                        for (int j = 0; j < 4; j++) {
-                            finalMatrix[i][j] = intermediateMatrix[i*4 + j];
+                }
+                else
+                {
+                    for (int i = 0; i < 4; i++)
+                    {
+                        for (int j = 0; j < 4; j++)
+                        {
+                            finalMatrix[i][j] = intermediateMatrix[i * 4 + j];
                         }
                     }
+                }
             }
-            } else if (type == "translacao") {
+            else if (type == "translacao")
+            {
                 cout << "Digite os parametros de translacao dx, dy e dz (3 doubles)\n";
                 double dx, dy, dz;
                 cin >> dx >> dy >> dz;
-                finalMatrix = {{1,0,0,-dx},{0,1,0,-dy},{0,0,1,-dz},{0,0,0,1}};
-
-            } else if (type == "rotacao") {
+                finalMatrix = {{1, 0, 0, -dx}, {0, 1, 0, -dy}, {0, 0, 1, -dz}, {0, 0, 0, 1}};
+            }
+            else if (type == "rotacao")
+            {
                 cout << "Em qual eixo deseja rotacionar? Digite x, y ou z (string)\n";
-                string axis; cin >> axis;
+                string axis;
+                cin >> axis;
                 cout << "Qual ângulo de rotacao? Digite em graus (double)\n";
-                double degree; cin >> degree;
-                double pi = 355.0/113.0;
+                double degree;
+                cin >> degree;
+                double pi = 355.0 / 113.0;
                 double rad = pi / 180.0;
-                degree = degree*(rad);
+                degree = degree * (rad);
 
-                if (axis == "x") {
-                    finalMatrix = {{1,0,0,0},{0,cos(degree),sin(degree),0},{0,-sin(degree),cos(degree),0},{0,0,0,1}};
-                } else if (axis == "y") {
-                    finalMatrix = {{cos(degree), 0, -sin(degree), 0},{0,1,0,0},{sin(degree),0,cos(degree),0},{0,0,0,1}};
-                } else if (axis == "z") {
-                    finalMatrix = {{cos(degree),sin(degree),0,0},{-sin(degree),cos(degree),0,0},{0,0,1,0},{0,0,0,1}};
+                if (axis == "x")
+                {
+                    finalMatrix = {{1, 0, 0, 0}, {0, cos(degree), sin(degree), 0}, {0, -sin(degree), cos(degree), 0}, {0, 0, 0, 1}};
                 }
-                
-            } else if (type == "escalar") {
+                else if (axis == "y")
+                {
+                    finalMatrix = {{cos(degree), 0, -sin(degree), 0}, {0, 1, 0, 0}, {sin(degree), 0, cos(degree), 0}, {0, 0, 0, 1}};
+                }
+                else if (axis == "z")
+                {
+                    finalMatrix = {{cos(degree), sin(degree), 0, 0}, {-sin(degree), cos(degree), 0, 0}, {0, 0, 1, 0}, {0, 0, 0, 1}};
+                }
+            }
+            else if (type == "escalar")
+            {
                 cout << "Digite os parametros a,b,c (3 doubles)\n";
-                double a,b,c;
+                double a, b, c;
                 cin >> a >> b >> c;
-                finalMatrix = {{1/a, 0, 0, 0},{0,1/b, 0, 0},{0,0,1/c, 0},{0,0,0,1}};
-
+                finalMatrix = {{1 / a, 0, 0, 0}, {0, 1 / b, 0, 0}, {0, 0, 1 / c, 0}, {0, 0, 0, 1}};
             }
 
-                cout << "Para qual objeto voce deseja aplicar essa transformacao?\n";
-                int inx;
-                cin >> inx;
-                if (transf.count(inx) > 0) {
-                    transf[inx] = MatrixMultiplication(transf[inx], finalMatrix);
-                } else
+            cout << "Para qual objeto voce deseja aplicar essa transformacao?\n";
+            int inx;
+            cin >> inx;
+            if (transf.count(inx) > 0)
+            {
+                transf[inx] = MatrixMultiplication(transf[inx], finalMatrix);
+            }
+            else
                 transf[inx] = finalMatrix;
-            
         }
-        else if (type == "light") {
+        else if (type == "light")
+        {
             cout << "Digite a origem da luz (ponto, 3 doubles)\n";
-            double x, y, z; cin >> x >> y >> z;
-            point3 lightOrigin = point3(x,y,z);
+            double x, y, z;
+            cin >> x >> y >> z;
+            point3 lightOrigin = point3(x, y, z);
 
             cout << "Digite a cor da luz (3 doubles)\n";
             cin >> x >> y >> z;
-            vec3 lightColor = vec3(x,y,z);
+            vec3 lightColor = vec3(x, y, z);
 
             light l = light(lightOrigin, lightColor);
             lights.push_back(l);
-
         }
         else if (type == "end")
         {
