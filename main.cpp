@@ -13,9 +13,10 @@
 typedef vector<vector<double>> Matrix;
 using namespace std;
 
-#define PHONG 0.5, 0.5, 0.2, 0.0, 0.0, 5.0
+#define PHONG 0.5, 0.5, 0.2, 0.0, 0.5, 5.0
+#define REF_INDEX 1.5
 
-vec3 color(const ray &r, vector<geometricObj *> &objects, map<int, Matrix> &transf, vector<light> &lights, point3 camOrigin)
+vec3 color(const ray &r, vector<geometricObj *> &objects, map<int, Matrix> &transf, vector<light> &lights, point3 camOrigin, int rec, int rec2)
 {
     vector<pair<double, int>> ts;
     vec3 normal;
@@ -87,7 +88,19 @@ vec3 color(const ray &r, vector<geometricObj *> &objects, map<int, Matrix> &tran
 
             //phongColor += diffuseColor*objColor + specularColor;
             phongColor += diffuseColor + specularColor;
+            if (rec < 4) phongColor += objf->kr*color(ray(intPoint, R), objects, transf, lights, camOrigin, rec+1, rec2);
         } //else phongColor *= vec3(objColor.r()/255, objColor.g()/255, objColor.b()/255);
+
+        double cos1 = dot(normal,V);
+        double sen1 = sqrt(1-cos1*cos1);
+        double n = 1/REF_INDEX;
+
+        double sen2 = sen1 / n;
+        double cos2 = sqrt(1 - sen2*sen2);
+        vec3 T = (1/n)*V - (cos2 - (1/n)*cos1)*normal;
+
+        if (rec2 < 4) phongColor += objf->kt*color(ray(intPoint, T), objects, transf, lights, camOrigin, rec, rec2+1);
+
 
     }
 
@@ -108,9 +121,26 @@ vec3 color(const ray &r, vector<geometricObj *> &objects, map<int, Matrix> &tran
     end
     */
 
-   
-        
-    
+   /*
+    0 0 0
+    1 0 0
+    0 1 0
+    1
+    400
+    400
+    sphere
+    5 2 0
+    1.5
+    255 0 0
+    light
+    5 0 4
+    255 255 255
+    sphere
+    5 -2 0
+    1.5
+    0 255 0
+    end
+    */
 
     phongColor = vec3(min(phongColor.r(), 255.0), min(phongColor.g(), 255.0), min(phongColor.b(), 255.0));
 
@@ -331,7 +361,7 @@ int main()
         {
             ray r(origin, bottomLeftCorner + (x * qx) + (y * qy));
 
-            vec3 col = color(r, objects, transf, lights, origin);
+            vec3 col = color(r, objects, transf, lights, origin, 0, 0);
             int ir = int(col.r());
             int ig = int(col.g());
             int ib = int(col.b());
