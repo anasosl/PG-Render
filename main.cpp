@@ -15,7 +15,7 @@ using namespace std;
 
 #define PHONG 0.5, 0.5, 0.2, 0.5, 0.5, 5.0
 #define REF_INDEX 1.5
-#define EPSILON 0.01
+#define EPSILON 0.8
 
 vec3 color(const ray &r, vector<geometricObj *> &objects, map<int, Matrix> &transf, vector<light> &lights, point3 camOrigin, int rec)
 {
@@ -72,49 +72,47 @@ vec3 color(const ray &r, vector<geometricObj *> &objects, map<int, Matrix> &tran
 
     vec3 phongColor = ambient*objf->ka;
 
+    vec3 V = camOrigin - intPoint;
+    V.make_unit_vector();
+
     for (light l : lights) {
         vec3 L = l.origin - intPoint;
         L.make_unit_vector();
 
+        for (auto obj : objects) {
+            if (obj == objf) continue;
+            if (objf->intersect(ray(intPoint, L)) > EPSILON) {
+                return vec3(0,0,0);
+            }
+        }
+        
         vec3 R = 2*normal*(dot(normal, L)) - L;
         R.make_unit_vector();
-
-        vec3 V = camOrigin - intPoint;
-        V.make_unit_vector();
 
         double cosDiffuse = dot(normal,L);
 
         if (cosDiffuse > 0) {
             vec3 diffuseColor = l.color * objf->kd * cosDiffuse*vec3(objColor.r()/255, objColor.g()/255, objColor.b()/255);
             vec3 specularColor = l.color * objf->ks * pow(max(dot(R, V), 0.0),objf->n);
-
-            //phongColor += diffuseColor*objColor + specularColor;
             phongColor += diffuseColor + specularColor;
             
-        } //else phongColor *= vec3(objColor.r()/255, objColor.g()/255, objColor.b()/255);
-
-        
-        vec3 R2 = 2*normal*(dot(normal, V)) - V;
-        R2.make_unit_vector();
-
-        double n = 1/REF_INDEX;
-        double d = dot(normal, V);
-        vec3 T = (n*d - sqrt(1-n*n*(1-d*d)))*normal - n*V;
-        T.make_unit_vector();
-
-        if (rec < 4) {
-            phongColor += objf->kr*color(ray(intPoint, R2), objects, transf, lights, camOrigin, rec+1);
-            phongColor += objf->kt*color(ray(intPoint, T), objects, transf, lights, camOrigin, rec+1);
         }
         
 
-            
-            
         
-
+    }
         
+    vec3 R2 = 2*normal*(dot(normal, V)) - V;
+    R2.make_unit_vector();
 
+    double n = 1/REF_INDEX;
+    double d = dot(normal, V);
+    vec3 T = (n*d - sqrt(1-n*n*(1-d*d)))*normal + n*V;
+    T.make_unit_vector();
 
+    if (rec < 4) {
+        //phongColor += objf->kr*color(ray(intPoint, R2), objects, transf, lights, camOrigin, rec+1);
+        phongColor += objf->kt*color(ray(intPoint, T), objects, transf, lights, camOrigin, rec+1);
     }
 
     /*
@@ -179,6 +177,94 @@ vec3 color(const ray &r, vector<geometricObj *> &objects, map<int, Matrix> &tran
     end
     */
 
+   /*
+    0 0 0
+    1 0 0
+    0 1 0
+    1
+    400
+    400
+    sphere
+    2 -1 0
+    0.7
+    0 0 0
+    light
+    2 0 0
+    255 255 255
+    plane
+    2 -5 0
+    0 1 0
+    0 255 0
+    end
+    */
+
+   /*
+   -1 0 0
+    1 0 0
+    0 1 0
+    1
+    400 
+    400
+    sphere
+    2 -1 0
+    1
+    0 0 0
+    plane
+    0 -1 0
+    0 1 0
+    0 255 0
+    light
+    0 10 0
+    255 255 255
+    end
+   */
+
+  /*
+   -1 0 0
+    1 0 0
+    0 1 0
+    1
+    400 
+    400
+    sphere
+    2 -1 0
+    1
+    0 0 0
+    plane
+    0 -1 0
+    0 1 0
+    0 255 0
+    light
+    2 3 3
+    255 255 255
+    end
+   */
+
+    /*
+    0 0 0
+    1 0 0
+    0 1 0
+    1 
+    500
+    500
+    mesh
+    2
+    4
+    5 0 0
+    5 1 0
+    5 0 1
+    5 1 1
+    0 1 2
+    1 2 3
+    255 0 0
+    light
+    255 255 255
+    5 2 
+    end
+    */
+
+
+
     phongColor = vec3(min(phongColor.r(), 255.0), min(phongColor.g(), 255.0), min(phongColor.b(), 255.0));
 
     return phongColor;
@@ -188,7 +274,7 @@ vec3 color(const ray &r, vector<geometricObj *> &objects, map<int, Matrix> &tran
 int main()
 {
     ofstream fOut;
-    fOut.open("test4.ppm");
+    fOut.open("test5.ppm");
 
     double x, y, z;
 
