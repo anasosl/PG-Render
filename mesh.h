@@ -66,7 +66,7 @@ public:
             if (dot(normal, PAB) < 0 || dot(normal, PAC) < 0 || dot(normal, PBC) < 0)
                 return -1;
 
-                        return t;
+        return t;
         }
         return -1;
     }
@@ -89,6 +89,7 @@ class Mesh : public geometricObj
     */
 public:
 
+    vec3 Normal;
     vector<Triangle> triangles;
 
     Mesh(int numTriangles, int numVertices, const vector<point3> &vertices, const vector<vector<int>> &triangleVertices, 
@@ -109,30 +110,27 @@ public:
         }
     }
 
-    double intersect(const ray &r) const
+    double intersect(const ray &r)
     {
         double t;
-        double maxT = -1;
-        vec3 maxNormal;
+        double minT = 10e9;
         // testa interseção com todos os triângulos
         for (auto a : triangles)
         {
             t = a.intersect(r);
             // t negativo significa que não tem interseção ou ela ocorreu atrás da câmera
-            if(t > 0 && t > maxT){
-                maxT = t;
-                maxNormal = a.intNormal(r, t);
+            if(t > 0 && t < minT){
+                minT = t;
+                Normal = a.intNormal(r, t);
             }
         }
 
-        triangleNormal = maxNormal;
-
-        return maxT;
+        return minT;
         
     }
 
-    vec3 intNormal(const ray &r, double t) const {
-        return triangleNormal;
+    vec3 intNormal(const ray &r, double t) {
+        return Normal;
     }
 
 };

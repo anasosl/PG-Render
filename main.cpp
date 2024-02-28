@@ -6,9 +6,9 @@
 #include "geometricObj.h"
 #include "camera.h"
 #include "mesh.h"
-#include <bits/stdc++.h>
 #include "transformation.cpp"
 #include "light.h"
+#include <map>
 
 typedef vector<vector<double>> Matrix;
 using namespace std;
@@ -111,7 +111,7 @@ vec3 color(const ray &r, vector<geometricObj *> &objects, map<int, Matrix> &tran
     T.make_unit_vector();
 
     if (rec < 4) {
-        //phongColor += objf->kr*color(ray(intPoint, R2), objects, transf, lights, camOrigin, rec+1);
+        phongColor += objf->kr*color(ray(intPoint, R2), objects, transf, lights, camOrigin, rec+1);
         phongColor += objf->kt*color(ray(intPoint, T), objects, transf, lights, camOrigin, rec+1);
     }
 
@@ -258,10 +258,37 @@ vec3 color(const ray &r, vector<geometricObj *> &objects, map<int, Matrix> &tran
     1 2 3
     255 0 0
     light
+    5 5 0
     255 255 255
     5 2 
     end
     */
+
+   /*
+   0 0 0
+   1 0 0
+   0 1 0
+   1
+   500
+   500
+   plane
+   0 0.5 0
+   0 1 0
+   0 0 255
+   sphere
+   2 0 1
+   0.8
+   255 0 0
+   sphere
+   2 0 -1
+   0.8
+   0 255 0
+   light
+   0 -1 -2
+   255 255 255
+   end
+   
+   */
 
 
 

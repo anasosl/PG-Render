@@ -9,7 +9,7 @@ public:
     const vec3 &color, double Kd, double Ks, double Ka, double Kr, double Kt, double N)
         : geometricObj(color, Kd, Ks, Ka, Kr, Kt, N), Normal(normal), PP(planepoint) {}
 
-    double intersect(const ray &r) const
+    double intersect(const ray &r)
     {
         double t;
 
@@ -28,7 +28,7 @@ public:
         return t;
     }
 
-    vec3 intNormal(const ray &r, double t) const {
+    vec3 intNormal(const ray &r, double t){
         if (dot(r.direction(), Normal) > 0) {
             return vec3(-Normal.x(), -Normal.y(), -Normal.z());
         } else return Normal;
