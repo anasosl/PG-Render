@@ -15,10 +15,9 @@ using namespace std;
 
 #define PHONG 0.5, 0.5, 0.2, 0.5, 0.5, 5.0
 #define REF_INDEX 1.5
-#define EPSILON 0.01
+#define EPSILON 0.02
 
 bool shadow(const ray &r, vector<geometricObj*> &objects, point3 lightOrigin, point3 intPoint) {
-
 
     for (long long unsigned int i = 0; i < objects.size(); i++)
     { 
@@ -27,13 +26,10 @@ bool shadow(const ray &r, vector<geometricObj*> &objects, point3 lightOrigin, po
 
         t = obj->intersect(r);
 
-        if (t > 0 && t < 1) {
+        if (t > EPSILON && t < 1) {
             return true;
         }
-
-
     }
-
     return false;
 }
 
@@ -100,15 +96,6 @@ vec3 color(const ray &r, vector<geometricObj *> &objects, map<int, Matrix> &tran
         if (shadow(ray(intPoint, L), objects, l.origin, intPoint)) continue;
 
         L.make_unit_vector();
-
-        
-
-        for (auto obj : objects) {
-            if (obj == objf) continue;
-            if (objf->intersect(ray(intPoint, L)) > EPSILON) {
-                return vec3(0,0,0);
-            }
-        }
         
         vec3 R = 2*normal*(dot(normal, L)) - L;
         R.make_unit_vector();
@@ -121,9 +108,6 @@ vec3 color(const ray &r, vector<geometricObj *> &objects, map<int, Matrix> &tran
             phongColor += diffuseColor + specularColor;
             
         }
-        
-
-        
     }
         
     vec3 R2 = 2*normal*(dot(normal, V)) - V;
@@ -134,10 +118,15 @@ vec3 color(const ray &r, vector<geometricObj *> &objects, map<int, Matrix> &tran
     vec3 T = (n*d - sqrt(1-n*n*(1-d*d)))*normal + n*V;
     T.make_unit_vector();
 
-    if (rec < 4) {
+    if (rec < 3) {
         phongColor += objf->kr*color(ray(intPoint, R2), objects, transf, lights, camOrigin, rec+1);
         phongColor += objf->kt*color(ray(intPoint, T), objects, transf, lights, camOrigin, rec+1);
     }
+
+    phongColor = vec3(min(phongColor.r(), 255.0), min(phongColor.g(), 255.0), min(phongColor.b(), 255.0));
+
+    return phongColor;
+    //return objColor;
 
     /*
     0 0 0
@@ -359,13 +348,6 @@ vec3 color(const ray &r, vector<geometricObj *> &objects, map<int, Matrix> &tran
     255 255 255
     end
   */
-
-
-
-    phongColor = vec3(min(phongColor.r(), 255.0), min(phongColor.g(), 255.0), min(phongColor.b(), 255.0));
-
-    return phongColor;
-    //return objColor;
 }
 
 int main()
