@@ -15,7 +15,27 @@ using namespace std;
 
 #define PHONG 0.5, 0.5, 0.2, 0.5, 0.5, 5.0
 #define REF_INDEX 1.5
-#define EPSILON 0.8
+#define EPSILON 0.01
+
+bool shadow(const ray &r, vector<geometricObj*> &objects, point3 lightOrigin, point3 intPoint) {
+
+
+    for (long long unsigned int i = 0; i < objects.size(); i++)
+    { 
+        geometricObj *obj = objects[i];
+        double t;
+
+        t = obj->intersect(r);
+
+        if (t > 0 && t < 1) {
+            return true;
+        }
+
+
+    }
+
+    return false;
+}
 
 vec3 color(const ray &r, vector<geometricObj *> &objects, map<int, Matrix> &transf, vector<light> &lights, point3 camOrigin, int rec)
 {
@@ -77,7 +97,11 @@ vec3 color(const ray &r, vector<geometricObj *> &objects, map<int, Matrix> &tran
 
     for (light l : lights) {
         vec3 L = l.origin - intPoint;
+        if (shadow(ray(intPoint, L), objects, l.origin, intPoint)) continue;
+
         L.make_unit_vector();
+
+        
 
         for (auto obj : objects) {
             if (obj == objf) continue;
@@ -91,7 +115,7 @@ vec3 color(const ray &r, vector<geometricObj *> &objects, map<int, Matrix> &tran
 
         double cosDiffuse = dot(normal,L);
 
-        if (cosDiffuse > 0) {
+        if (cosDiffuse > EPSILON) {
             vec3 diffuseColor = l.color * objf->kd * cosDiffuse*vec3(objColor.r()/255, objColor.g()/255, objColor.b()/255);
             vec3 specularColor = l.color * objf->ks * pow(max(dot(R, V), 0.0),objf->n);
             phongColor += diffuseColor + specularColor;
@@ -289,6 +313,52 @@ vec3 color(const ray &r, vector<geometricObj *> &objects, map<int, Matrix> &tran
    end
    
    */
+
+  /*
+    -1 0 0
+    1 0 0
+    0 1 0
+    1
+    400 
+    400
+    sphere
+    5 0 0
+    1
+    0 0 0
+    plane
+    0 -1 0
+    0 1 0
+    0 255 0
+    light
+    5 3 0
+    255 255 255
+    end
+  */
+
+ /*
+    -1 0 0
+    1 0 0
+    0 1 0
+    1
+    400 
+    400
+    sphere
+    5 0 2
+    1
+    0 0 0
+    sphere
+    5 0 -2
+    1
+    0 0 0
+    plane
+    0 -1 0
+    0 1 0
+    0 255 0
+    light
+    5 3 0
+    255 255 255
+    end
+  */
 
 
 
