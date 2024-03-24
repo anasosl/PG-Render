@@ -1,5 +1,6 @@
 #include <fstream>
 #include <iostream>
+#include <algorithm> 
 #include "ray.h"
 #include "sphere.h"
 #include "plane.h"
