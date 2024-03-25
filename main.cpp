@@ -9,6 +9,7 @@
 #include "transformation.cpp"
 #include "light.h"
 #include <map>
+#include <algorithm>
 
 typedef vector<vector<double>> Matrix;
 using namespace std;
