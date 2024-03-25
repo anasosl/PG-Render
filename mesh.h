@@ -84,7 +84,7 @@ class Mesh : public geometricObj
     /*
         numTriangles = número de triângulos
         numVertices = número de vértices
-        vertices = lista de vértices (pontos)
+        vertices = lista de vértices (pontos) 
         triangleVertices = lista com triplas dos vértices
     */
 public:
