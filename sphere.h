@@ -9,7 +9,7 @@ public:
     const vec3 &color, double Kd, double Ks, double Ka, double Kr, double Kt, double N)
         : geometricObj(color, Kd, Ks, Ka, Kr, Kt, N), Center(center), Radious(radius) {}
 
-    double intersect(const ray &r)
+    pair<double, vec3> intersect(const ray &r)
     {
         double t;
 
@@ -28,7 +28,7 @@ public:
         else
             t = -1;
 
-        return t;
+        return {t, intNormal(r, t)};
     }
     vec3 intNormal(const ray &r, double t) {
         return (r.origin() + t*r.direction()) - Center;

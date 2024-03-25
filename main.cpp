@@ -10,6 +10,7 @@
 #include "transformation.cpp"
 #include "light.h"
 #include <map>
+#include <algorithm>
 
 typedef vector<vector<double>> Matrix;
 using namespace std;
@@ -23,9 +24,8 @@ bool shadow(const ray &r, vector<geometricObj*> &objects, point3 lightOrigin, po
     for (long long unsigned int i = 0; i < objects.size(); i++)
     { 
         geometricObj *obj = objects[i];
-        double t;
 
-        t = obj->intersect(r);
+        auto [t, normal] = obj->intersect(r);
 
         if (t > EPSILON && t < 1) {
             return true;
@@ -47,8 +47,9 @@ vec3 color(const ray &r, vector<geometricObj *> &objects, map<int, Matrix> &tran
 
         if (transf.count(i) > 0) {
             ray r2 = ray(point_transformation(transf[i], r.origin()), vector_transformation(transf[i], r.direction()));
-            t = obj->intersect(r2);
-            normal = obj->intNormal(r2, t);
+            pair<double, vec3> output = obj->intersect(r2);
+            t = output.first;
+            normal = output.second;
 
             vector<double> a(4);
             Matrix transp(4, a);
@@ -57,8 +58,9 @@ vec3 color(const ray &r, vector<geometricObj *> &objects, map<int, Matrix> &tran
             normal = vector_transformation(transp, normal);
 
         } else {
-            t = obj->intersect(r);
-            normal = obj->intNormal(r, t);
+            pair<double, vec3> output = obj->intersect(r);
+            t = output.first;
+            normal = output.second;
         }
         
         // a interseção só é válida se ocorrer depois do plano
