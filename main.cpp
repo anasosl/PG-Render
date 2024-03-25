@@ -9,6 +9,8 @@
 #include "transformation.cpp"
 #include "light.h"
 #include <map>
+#include <algorithm>
+#include "areaLight.h"
 
 typedef vector<vector<double>> Matrix;
 using namespace std;
@@ -33,7 +35,7 @@ bool shadow(const ray &r, vector<geometricObj*> &objects, point3 lightOrigin, po
     return false;
 }
 
-vec3 color(const ray &r, vector<geometricObj *> &objects, map<int, Matrix> &transf, vector<light> &lights, point3 camOrigin, int rec)
+vec3 color(const ray &r, vector<geometricObj *> &objects, map<int, Matrix> &transf, vector<light> &lights, vector<areaLight> &areaLights, point3 camOrigin, int rec)
 {
     vector<pair<double, int>> ts;
     vec3 normal;
@@ -79,7 +81,6 @@ vec3 color(const ray &r, vector<geometricObj *> &objects, map<int, Matrix> &tran
     vec3 objColor = objf->color;
 
     vec3 ambient = vec3(0,0,0);
-    //vec3 ambient = objColor;
 
     point3 intPoint = r.origin() + ts[0].first*r.direction();
     double t = ts[0].first;
@@ -109,6 +110,32 @@ vec3 color(const ray &r, vector<geometricObj *> &objects, map<int, Matrix> &tran
             
         }
     }
+
+    for (areaLight l : areaLights) {
+        for(int i = 0; i < 10; i++) {
+            double t = (double) rand() / RAND_MAX;
+
+            point3 origin = l.origin + l.l*t;
+
+            vec3 L = origin - intPoint;
+            if (shadow(ray(intPoint, L), objects, l.origin, intPoint)) continue;
+
+            L.make_unit_vector();
+            
+            vec3 R = 2*normal*(dot(normal, L)) - L;
+            R.make_unit_vector();
+
+            double cosDiffuse = dot(normal,L);
+
+            if (cosDiffuse > EPSILON) {
+                vec3 diffuseColor = l.color * objf->kd * cosDiffuse*vec3(objColor.r()/255, objColor.g()/255, objColor.b()/255);
+                vec3 specularColor = l.color * objf->ks * pow(max(dot(R, V), 0.0),objf->n);
+                phongColor += diffuseColor + specularColor;
+                
+            }
+        }
+        
+    }
         
     vec3 R2 = 2*normal*(dot(normal, V)) - V;
     R2.make_unit_vector();
@@ -119,14 +146,13 @@ vec3 color(const ray &r, vector<geometricObj *> &objects, map<int, Matrix> &tran
     T.make_unit_vector();
 
     if (rec < 3) {
-        phongColor += objf->kr*color(ray(intPoint, R2), objects, transf, lights, camOrigin, rec+1);
-        phongColor += objf->kt*color(ray(intPoint, T), objects, transf, lights, camOrigin, rec+1);
+        phongColor += objf->kr*color(ray(intPoint, R2), objects, transf, lights, areaLights, camOrigin, rec+1);
+        phongColor += objf->kt*color(ray(intPoint, T), objects, transf, lights, areaLights, camOrigin, rec+1);
     }
 
     phongColor = vec3(min(phongColor.r(), 255.0), min(phongColor.g(), 255.0), min(phongColor.b(), 255.0));
 
     return phongColor;
-    //return objColor;
 
     /*
     0 0 0
@@ -318,8 +344,9 @@ vec3 color(const ray &r, vector<geometricObj *> &objects, map<int, Matrix> &tran
     0 -1 0
     0 1 0
     0 255 0
-    light
-    5 3 0
+    vlight
+    5 3 -1
+    0 0 2
     255 255 255
     end
   */
@@ -392,8 +419,9 @@ int main()
     vector<geometricObj *> objects;
     map<int, Matrix> transf;
     vector<light> lights;
+    vector<areaLight> areaLights;
 
-    cout << "\ndigite end para gerar a imagem | plane para adicionar um plano | sphere para adicionar uma esfera | mesh para uma malha de triangulos | matrix para uma matriz de transformação afim | light para adicionar luz\n";
+    cout << "\ndigite end para gerar a imagem | plane para adicionar um plano | sphere para adicionar uma esfera \n| mesh para uma malha de triangulos | \n matrix para uma matriz de transformação afim | light para adicionar luz pontual | vlight para adicionar luz extensa\n";
     while (true)
     {
         string type = "";
@@ -548,6 +576,23 @@ int main()
             lights.push_back(l);
 
         }
+        else if (type == "vlight") {
+            cout << "Digite a origem da luz (ponto, 3 doubles)\n";
+            double x, y, z; cin >> x >> y >> z;
+            point3 lightOrigin = point3(x,y,z);
+
+            cout << "Digite o vector da luz (3 doubles)\n";
+            cin >> x >> y >> z;
+            vec3 L = vec3(x,y,z);
+
+            cout << "Digite a cor da luz (3 doubles)\n";
+            cin >> x >> y >> z;
+            vec3 lightColor = vec3(x,y,z);
+
+            areaLight l = areaLight(lightOrigin, lightColor, L);
+            areaLights.push_back(l);
+
+        }
         else if (type == "end")
         {
             break;
@@ -563,7 +608,7 @@ int main()
         {
             ray r(origin, bottomLeftCorner + (x * qx) + (y * qy));
 
-            vec3 col = color(r, objects, transf, lights, origin, 0);
+            vec3 col = color(r, objects, transf, lights, areaLights, origin, 0);
             int ir = int(col.r());
             int ig = int(col.g());
             int ib = int(col.b());
