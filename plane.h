@@ -9,7 +9,7 @@ public:
     const vec3 &color, double Kd, double Ks, double Ka, double Kr, double Kt, double N)
         : geometricObj(color, Kd, Ks, Ka, Kr, Kt, N), Normal(normal), PP(planepoint) {}
 
-    double intersect(const ray &r)
+    pair<double, vec3> intersect(const ray &r)
     {
         double t;
 
@@ -25,7 +25,7 @@ public:
         }
             
     
-        return t;
+        return {t, intNormal(r,t)};
     }
 
     vec3 intNormal(const ray &r, double t){

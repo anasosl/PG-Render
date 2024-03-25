@@ -12,6 +12,8 @@
 #include "point3.h"
 #include "plane.h"
 
+#define EPSILON 0.02
+
 using namespace std;
 
 vec3 triangleNormal;
@@ -54,7 +56,8 @@ public:
     {
 
         plane plan = plane(A, normal, vec3(0,0,0), 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
-        double t = plan.intersect(r);
+        pair<double, vec3> output = plan.intersect(r);
+        double t = output.first;
         if(t>0)
         {
             point3 P = r.point_at(t);
@@ -71,7 +74,7 @@ public:
         return -1;
     }
 
-    vec3 intNormal(const ray &r, double t) const {
+    vec3 intNormal(const ray &r) const {
         if (dot(r.direction(), normal) > 0) {
             return vec3(-normal.x(), -normal.y(), -normal.z());
         } else return normal;
@@ -89,7 +92,6 @@ class Mesh : public geometricObj
     */
 public:
 
-    vec3 Normal;
     vector<Triangle> triangles;
 
     Mesh(int numTriangles, int numVertices, const vector<point3> &vertices, const vector<vector<int>> &triangleVertices, 
@@ -110,28 +112,35 @@ public:
         }
     }
 
-    double intersect(const ray &r)
+    pair<double, vec3> intersect(const ray &r)
     {
+        auto [t, a] = intersectTriangle(r);
+        vec3 normal = a.intNormal(r);
+
+        return {t, normal};
+        
+    }
+
+    
+    pair<double,Triangle> intersectTriangle(const ray &r) {
         double t;
-        double minT = 10e9;
-        // testa interseção com todos os triângulos
+        double minT = 10000000;
+        point3 A = point3(0,0,0);
+        Triangle T = Triangle(A,A,A);
+        
         for (auto a : triangles)
         {
             t = a.intersect(r);
             // t negativo significa que não tem interseção ou ela ocorreu atrás da câmera
             if(t > 0 && t < minT){
                 minT = t;
-                Normal = a.intNormal(r, t);
+                T = a;
             }
         }
 
-        return minT;
-        
+        return {minT, T};
     }
 
-    vec3 intNormal(const ray &r, double t) {
-        return Normal;
-    }
 
 };
 
