@@ -49,15 +49,13 @@ class Bezier{
 
     Mesh triangulate(double tolerance){
 
-        vector<vector<point3>> bezier_points;
-        vector<point3> columns;
+        vector<point3> bezier_points;
         vector<vector<int>> listTriangles;
 
         for(double s=0; s<=1; s+=tolerance){
             for(double t=0; t<=1; t+=tolerance){
-                columns.push_back(surface_point(s,t));
+                bezier_points.push_back(surface_point(s,t));
             }
-            bezier_points.push_back(columns);
         }
 
         int n = int(1/tolerance);
