@@ -23,24 +23,25 @@ class Bezier{
         control_points = points;
     }
 
-    ll bernstein(int n, int i, int t){
+    double bernstein(int n, int i, double t){
         ll binomial_coef = factorial(n) / (factorial(i)*factorial(n - i));
-        return binomial_coef * pow(t, i) * (pow(1-t, n-i));
+        double res = binomial_coef * pow(t, i) * (pow(1-t, n-i));
+        return res;
     }
 
-    point3 surface_point(int s, int t){
+    point3 surface_point(double s, double t){
         int rows = control_points.size();
         vec3 point = vec3(0,0,0);
         int columns;
-        ll bs;
-        ll bt;
+        double bs;
+        double bt;
 
         for(int i=0; i<rows; i++){
             columns = control_points[i].size();
             for(int j=0; j<columns; j++){
                 bs = bernstein(rows - 1, i, s);
                 bt = bernstein(columns - 1, j, t);
-                point =  point + bs * bt * control_points[i][j];
+                point = point + bs * bt * control_points[i][j];
             } 
         }
 

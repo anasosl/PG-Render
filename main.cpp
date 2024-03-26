@@ -12,6 +12,7 @@
 #include "bezier.h"
 #include <map>
 #include <algorithm>
+#include <iomanip> // para std::setw
 
 typedef vector<vector<double>> Matrix;
 using namespace std;
@@ -123,8 +124,8 @@ vec3 color(const ray &r, vector<geometricObj *> &objects, map<int, Matrix> &tran
     T.make_unit_vector();
 
     if (rec < 3) {
-        phongColor += objf->kr*color(ray(intPoint, R2), objects, transf, lights, camOrigin, rec+1);
-        phongColor += objf->kt*color(ray(intPoint, T), objects, transf, lights, camOrigin, rec+1);
+        //phongColor += objf->kr*color(ray(intPoint, R2), objects, transf, lights, camOrigin, rec+1);
+        //phongColor += objf->kt*color(ray(intPoint, T), objects, transf, lights, camOrigin, rec+1);
     }
 
     phongColor = vec3(min(phongColor.r(), 255.0), min(phongColor.g(), 255.0), min(phongColor.b(), 255.0));
@@ -355,10 +356,10 @@ int main()
     vec3 p16 = vec3(1, 0.5, -1);
 
     vector<vector<vec3>> control_points = {
-                                            {p0, p1, p5,p6}, 
-                                            {p1, p2, p7,p8},
-                                            {p2, p3, p9,p10},
-                                            {p3, p4, p11,p12},
+                                            {p0, p1, p5, p6}, 
+                                            {p1, p2, p7, p8},
+                                            {p2, p3, p9, p10},
+                                            {p3, p4, p11, p12},
                                             {p0, p13, p14, p2},
                                             {p2, p15, p16, p0} };
 
@@ -369,6 +370,9 @@ int main()
 
     fOut << "P3\n";
     fOut << resh << " " << resv << "\n255\n";
+
+    int step = 0;
+    int total = resv;
 
     for (int y = resv - 1; y >= 0; y--)
     {
@@ -382,6 +386,23 @@ int main()
             int ib = int(col.b());
             fOut << ir << ' ' << ig << ' ' << ib << '\n';
         }
-    }
+
+        // Atualização do progresso a cada linha completada
+            ++step;
+            float progress = (step / (float)total) * 100;
+
+            // Limpa a linha atual no terminal e imprime o progresso
+            std::cout << "\r[";
+            int pos = progress / 2; // Para uma barra de 50 caracteres
+            for (int i = 0; i < 50; ++i) {
+                if (i < pos) std::cout << "=";
+                else if (i == pos) std::cout << ">";
+                else std::cout << " ";
+            }
+            std::cout << "] " << int(progress) << " % Completado";
+            std::flush(std::cout); // Força a saída a ser escrita imediatamente
+        }
+
+        std::cout << std::endl; // Nova linha ao final para não sobrescrever a barra de progresso
     return 0;
 }
