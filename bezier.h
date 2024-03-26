@@ -19,8 +19,8 @@ class Bezier{
     public:
     vector<vector<vec3>> control_points;
 
-    Bezier(){
-
+    Bezier(vector<vector<vec3>> points){
+        control_points = points;
     }
 
     ll bernstein(int n, int i, int t){
@@ -47,7 +47,7 @@ class Bezier{
         return point3(point[0], point[1], point[2]);
     }
 
-    Mesh triangulate(double tolerance){
+    Mesh* triangulate(double tolerance){
 
         vector<point3> bezier_points;
         vector<vector<int>> listTriangles;
@@ -68,7 +68,7 @@ class Bezier{
             }
         }
 
-        return Mesh(listTriangles.size(), bezier_points.size(), bezier_points, listTriangles, (255,0,0), (0.5, 0.5, 0.2, 0.5, 0.5, 5.0));
+        return new Mesh(listTriangles.size(), numberOfPoints, bezier_points, listTriangles, vec3(255,0,0), 0.5, 0.5, 0.2, 0.5, 0.5, 5.0);
     }
 
 };

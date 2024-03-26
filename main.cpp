@@ -9,6 +9,7 @@
 #include "mesh.h"
 #include "transformation.cpp"
 #include "light.h"
+#include "bezier.h"
 #include <map>
 #include <algorithm>
 
@@ -129,234 +130,12 @@ vec3 color(const ray &r, vector<geometricObj *> &objects, map<int, Matrix> &tran
     phongColor = vec3(min(phongColor.r(), 255.0), min(phongColor.g(), 255.0), min(phongColor.b(), 255.0));
 
     return phongColor;
-    //return objColor;
-
-    /*
-    0 0 0
-    1 0 0
-    0 1 0
-    1
-    400
-    400
-    sphere
-    5 0 0
-    1.5
-    255 0 0
-    light
-    5 5 0
-    255 255 255
-    end
-    */
-
-   /*
-    0 0 0
-    1 0 0
-    0 1 0
-    1
-    400
-    400
-    sphere
-    5 2 0
-    1.5
-    255 0 0
-    light
-    5 0 4
-    255 255 255
-    sphere
-    5 -2 0
-    1.5
-    0 255 0
-    light 
-    5 0 -4
-    255 255 255
-    end
-    */
-
-   /*
-    0 0 0
-    1 0 0
-    0 1 0
-    1
-    400
-    400
-    sphere
-    5 2 0
-    1.5
-    255 0 0
-    light
-    0 0 0
-    255 255 255
-    sphere
-    15 0 0
-    1.5
-    0 255 0
-    end
-    */
-
-   /*
-    0 0 0
-    1 0 0
-    0 1 0
-    1
-    400
-    400
-    sphere
-    2 -1 0
-    0.7
-    0 0 0
-    light
-    2 0 0
-    255 255 255
-    plane
-    2 -5 0
-    0 1 0
-    0 255 0
-    end
-    */
-
-   /*
-   -1 0 0
-    1 0 0
-    0 1 0
-    1
-    400 
-    400
-    sphere
-    2 -1 0
-    1
-    0 0 0
-    plane
-    0 -1 0
-    0 1 0
-    0 255 0
-    light
-    0 10 0
-    255 255 255
-    end
-   */
-
-  /*
-   -1 0 0
-    1 0 0
-    0 1 0
-    1
-    400 
-    400
-    sphere
-    2 -1 0
-    1
-    0 0 0
-    plane
-    0 -1 0
-    0 1 0
-    0 255 0
-    light
-    2 3 3
-    255 255 255
-    end
-   */
-
-    /*
-    0 0 0
-    1 0 0
-    0 1 0
-    1 
-    500
-    500
-    mesh
-    2
-    4
-    5 0 0
-    5 1 0
-    5 0 1
-    5 1 1
-    0 1 2
-    1 2 3
-    255 0 0
-    light
-    5 5 0
-    255 255 255
-    5 2 
-    end
-    */
-
-   /*
-   0 0 0
-   1 0 0
-   0 1 0
-   1
-   500
-   500
-   plane
-   0 0.5 0
-   0 1 0
-   0 0 255
-   sphere
-   2 0 1
-   0.8
-   255 0 0
-   sphere
-   2 0 -1
-   0.8
-   0 255 0
-   light
-   0 -1 -2
-   255 255 255
-   end
-   
-   */
-
-  /*
-    -1 0 0
-    1 0 0
-    0 1 0
-    1
-    400 
-    400
-    sphere
-    5 0 0
-    1
-    0 0 0
-    plane
-    0 -1 0
-    0 1 0
-    0 255 0
-    light
-    5 3 0
-    255 255 255
-    end
-  */
-
- /*
-    -1 0 0
-    1 0 0
-    0 1 0
-    1
-    400 
-    400
-    sphere
-    5 0 2
-    1
-    0 0 0
-    sphere
-    5 0 -2
-    1
-    0 0 0
-    plane
-    0 -1 0
-    0 1 0
-    0 255 0
-    light
-    5 3 0
-    255 255 255
-    end
-  */
 }
 
 int main()
 {
     ofstream fOut;
-    fOut.open("test5.ppm");
+    fOut.open("bezier1.ppm");
 
     double x, y, z;
 
@@ -556,6 +335,37 @@ int main()
             break;
         }
     }
+
+    vec3 p0 = vec3(1,0,0);
+    vec3 p1 = vec3(0,0,1);
+    vec3 p2 = vec3(-1,0,0);
+    vec3 p3 = vec3(0,0,-1);
+    vec3 p4 = vec3(0,1,0);
+    vec3 p5 = vec3(0.5, 0, 0.5);
+    vec3 p6 = vec3(0, 0.5, 0.5);
+    vec3 p7 = vec3(-0.5, 0, 0.5);
+    vec3 p8 = vec3(-0.5, 0.5, 0);
+    vec3 p9 = vec3(-0.5, 0, -0.5);
+    vec3 p10 = vec3(0, 0.5, -0.5);
+    vec3 p11 = vec3(0.5, 0, -0.5);
+    vec3 p12 = vec3(0.5, 0.5, 0);
+    vec3 p13 = vec3(1, 0.5, 1);
+    vec3 p14 = vec3(-1, 0.5, 1);
+    vec3 p15 = vec3(-1, 0.5, -1);
+    vec3 p16 = vec3(1, 0.5, -1);
+
+    vector<vector<vec3>> control_points = {
+                                            {p0, p1, p5,p6}, 
+                                            {p1, p2, p7,p8},
+                                            {p2, p3, p9,p10},
+                                            {p3, p4, p11,p12},
+                                            {p0, p13, p14, p2},
+                                            {p2, p15, p16, p0} };
+
+    Bezier bezier_test = Bezier(control_points);
+    Mesh * bezier_surface = bezier_test.triangulate(0.1);
+
+    objects.push_back(bezier_surface);
 
     fOut << "P3\n";
     fOut << resh << " " << resv << "\n255\n";
