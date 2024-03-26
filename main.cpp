@@ -13,11 +13,12 @@
 #include <map>
 #include <algorithm>
 #include <iomanip> // para std::setw
+#include "texture.cpp"
 
 typedef vector<vector<double>> Matrix;
 using namespace std;
 
-#define PHONG 0.5, 0.5, 0.2, 0.5, 0.5, 5.0
+#define PHONG 0.5, 0.5, 1, 0.5, 0.5, 5.0
 #define REF_INDEX 1.5
 #define EPSILON 0.02
 
@@ -36,7 +37,7 @@ bool shadow(const ray &r, vector<geometricObj*> &objects, point3 lightOrigin, po
     return false;
 }
 
-vec3 color(const ray &r, vector<geometricObj *> &objects, map<int, Matrix> &transf, vector<light> &lights, point3 camOrigin, int rec)
+vec3 color(const ray &r, vector<geometricObj *> &objects, map<int, Matrix> &transf, vector<light> &lights, point3 camOrigin, int rec, vector<vector<vec3>> &texture, int resx, int resy)
 {
     vector<pair<double, int>> ts;
     vec3 normal;
@@ -81,7 +82,7 @@ vec3 color(const ray &r, vector<geometricObj *> &objects, map<int, Matrix> &tran
     geometricObj *objf = objects[ts[0].second];
     normal = normals[ts[0].second];
 
-    vec3 objColor = objf->color;
+    vec3 objColor = texture[resx][resy];
 
     vec3 ambient = vec3(0,0,0);
     //vec3 ambient = objColor;
@@ -175,6 +176,9 @@ int main()
     vector<geometricObj *> objects;
     map<int, Matrix> transf;
     vector<light> lights;
+
+    vector<vector<vec3>> texture;
+    texture = getTexture();
 
     cout << "\ndigite end para gerar a imagem | plane para adicionar um plano | sphere para adicionar uma esfera | mesh para uma malha de triangulos | matrix para uma matriz de transformação afim | light para adicionar luz\n";
     while (true)
@@ -355,13 +359,12 @@ int main()
     vec3 p15 = vec3(-1, 0.5, -1);
     vec3 p16 = vec3(1, 0.5, -1);
 
-    vector<vector<vec3>> control_points = {
-                                            {p0, p1, p5, p6}, 
-                                            {p1, p2, p7, p8},
-                                            {p2, p3, p9, p10},
-                                            {p3, p4, p11, p12},
-                                            {p0, p13, p14, p2},
-                                            {p2, p15, p16, p0} };
+    std::vector<std::vector<vec3>> control_points = {
+        {vec3(-1, 0, 1), vec3(-0.5, 1, 1), vec3(0.5, 1.5, 1), vec3(1, 0, 1)},
+        {vec3(-1, 0.5, 0), vec3(-0.5, 1, 0), vec3(0.5, 2, 0), vec3(1, 0.5, 0)},
+        {vec3(-1, 1, -1), vec3(-0.5, 1.5, -1), vec3(0.5, 1, -1), vec3(1, 0, -1)},
+        {vec3(-1, 1.5, -2), vec3(-0.5, 1, -2), vec3(0.5, 0.5, -2), vec3(1, 0, -2)}
+    };
 
     Bezier bezier_test = Bezier(control_points);
     Mesh * bezier_surface = bezier_test.triangulate(0.1);
@@ -380,7 +383,7 @@ int main()
         {
             ray r(origin, bottomLeftCorner + (x * qx) + (y * qy));
 
-            vec3 col = color(r, objects, transf, lights, origin, 0);
+            vec3 col = color(r, objects, transf, lights, origin, 0, texture, y, x);
             int ir = int(col.r());
             int ig = int(col.g());
             int ib = int(col.b());
