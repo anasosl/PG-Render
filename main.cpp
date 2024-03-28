@@ -82,7 +82,7 @@ vec3 color(const ray &r, vector<geometricObj *> &objects, map<int, Matrix> &tran
     geometricObj *objf = objects[ts[0].second];
     normal = normals[ts[0].second];
 
-    vec3 objColor = texture[resx][resy];
+    vec3 objColor = objf->getColor(texture, resx, resy);
 
     vec3 ambient = vec3(0,0,0);
     //vec3 ambient = objColor;

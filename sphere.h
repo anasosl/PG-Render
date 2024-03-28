@@ -34,6 +34,10 @@ public:
         return (r.origin() + t*r.direction()) - Center;
     }
 
+    vec3 getColor(vector<vector<vec3>> &texture, int resx, int resy) {
+        return color;
+    }
+
     point3 Center;
     double Radious;
 };

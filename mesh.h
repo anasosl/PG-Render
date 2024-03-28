@@ -141,6 +141,10 @@ public:
         return {minT, T};
     }
 
+    vec3 getColor(vector<vector<vec3>> &texture, int resx, int resy) {
+        return texture[resx][resy];
+    }
+
 
 };
 

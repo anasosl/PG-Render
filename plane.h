@@ -34,6 +34,10 @@ public:
         } else return Normal;
     }
 
+    vec3 getColor(vector<vector<vec3>> &texture, int resx, int resy) {
+        return color;
+    }
+
     point3 PP;
     vec3 Normal;
 };
