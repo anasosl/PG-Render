@@ -8,19 +8,85 @@
 #include <vector>
 #include <tuple>
 #include <math.h>
+#include <map>
 #include "mesh.h"
-
 
 ll factorial(int n){
     return (n == 1 || n == 0) ? 1 : factorial(n - 1) * n;
 }
 
-class Bezier{
+class Bezier : public geometricObj {
     public:
     vector<vector<vec3>> control_points;
+    vector<Triangle> triangles;
+    map<tuple<double,double,double>, pair<double,double>> st;
 
-    Bezier(vector<vector<vec3>> points){
-        control_points = points;
+    pair<double, double> getST(point3 vert) {
+        return st[{vert.x(), vert.y(), vert.z()}];
+    }
+
+    Bezier(vector<vector<vec3>> points, const vec3 &color, double Kd, double Ks, double Ka, double Kr, double Kt, double N)
+        : geometricObj(color, Kd, Ks, Ka, Kr, Kt, N) {
+            control_points = points;
+        }
+
+    tuple<double, vec3, vec3> intersect(const ray &r, vector<vector<vec3>> &texture)
+    {
+        auto [t, a] = intersectTriangle(r);
+        vec3 normal = a.intNormal(r);
+
+        vec3 color = getColor(a, r.point_at(t), texture);
+
+        return {t, normal, color};
+        
+    }
+    
+    pair<double,Triangle> intersectTriangle(const ray &r) {
+        double t;
+        double minT = 10000000;
+        point3 A = point3(0,0,0);
+        Triangle T = Triangle(A,A,A);
+        
+        for (auto a : triangles)
+        {
+            t = a.intersect(r);
+            // t negativo significa que não tem interseção ou ela ocorreu atrás da câmera
+            if(t > 0 && t < minT){
+                minT = t;
+                T = a;
+            }
+        }
+
+        return {minT, T};
+    }
+
+    vec3 getColor (Triangle a, point3 P, vector<vector<vec3>> &texture) {
+        point3 A = a.A;
+        point3 B = a.B;
+        point3 C = a.C;
+
+        vec3 PAB = cross(A - P, B - P);
+        vec3 PAC = cross(C - P, A - P);
+        vec3 PBC = cross(C - P, B - P);
+
+        vec3 ABC = cross(C - B, A - B);
+
+        double alpha = PAB.length()/ABC.length();
+        double beta = PAC.length()/ABC.length();
+        double gamma = PBC.length()/ABC.length();
+
+        auto [sa, ta] = getST(A);
+        auto [sb, tb] = getST(B);
+        auto [sc, tc] = getST(C);
+
+        double s = sa*alpha + sb*beta + sc*gamma;
+        double t = ta*alpha + tb*beta + tc*gamma;
+
+        int x = texture.size()*s;
+        int y = texture[x].size()*t;
+
+        return texture[x][y];
+
     }
 
     double bernstein(int n, int i, double t){
@@ -45,10 +111,14 @@ class Bezier{
             } 
         }
 
-        return point3(point[0], point[1], point[2]);
+        point3 p = point3(point[0], point[1], point[2]);
+
+        st[{p.x(), p.y(), p.z()}] = {s,t};
+
+        return p;
     }
 
-    Mesh* triangulate(double tolerance){
+    void triangulate(double tolerance){
 
         vector<point3> bezier_points;
         vector<vector<int>> listTriangles;
@@ -69,8 +139,21 @@ class Bezier{
             }
         }
 
-        return new Mesh(listTriangles.size(), numberOfPoints, bezier_points, listTriangles, vec3(255,0,0), 0.5, 0.5, 0.2, 0.5, 0.5, 5.0);
+        for (int i = 0; i < listTriangles.size(); i++)
+        {
+            int idxA = listTriangles[i][0];
+            int idxB = listTriangles[i][1];
+            int idxC = listTriangles[i][2];
+
+            point3 A = bezier_points[idxA];
+            point3 B = bezier_points[idxB];
+            point3 C = bezier_points[idxC];
+
+            triangles.push_back(Triangle(A, B, C));
+        }
     }
+
+    
 
 };
 

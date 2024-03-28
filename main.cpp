@@ -22,13 +22,12 @@ using namespace std;
 #define REF_INDEX 1.5
 #define EPSILON 0.02
 
-bool shadow(const ray &r, vector<geometricObj*> &objects, point3 lightOrigin, point3 intPoint) {
+bool shadow(const ray &r, vector<geometricObj*> &objects, point3 lightOrigin, point3 intPoint, vector<vector<vec3>> &texture) {
 
     for (long long unsigned int i = 0; i < objects.size(); i++)
     { 
         geometricObj *obj = objects[i];
-
-        auto [t, normal] = obj->intersect(r);
+        auto [t, normal, color] = obj->intersect(r, texture);
 
         if (t > EPSILON && t < 1) {
             return true;
@@ -42,6 +41,7 @@ vec3 color(const ray &r, vector<geometricObj *> &objects, map<int, Matrix> &tran
     vector<pair<double, int>> ts;
     vec3 normal;
     vector<vec3> normals(objects.size());
+    vec3 objColor;
 
     for (long long unsigned int i = 0; i < objects.size(); i++)
     {
@@ -50,9 +50,10 @@ vec3 color(const ray &r, vector<geometricObj *> &objects, map<int, Matrix> &tran
 
         if (transf.count(i) > 0) {
             ray r2 = ray(point_transformation(transf[i], r.origin()), vector_transformation(transf[i], r.direction()));
-            pair<double, vec3> output = obj->intersect(r2);
-            t = output.first;
-            normal = output.second;
+            tuple<double, vec3, vec3> output = obj->intersect(r2, texture);
+            t = get<0>(output);
+            normal = get<1>(output);
+            objColor = get<2>(output);
 
             vector<double> a(4);
             Matrix transp(4, a);
@@ -61,9 +62,10 @@ vec3 color(const ray &r, vector<geometricObj *> &objects, map<int, Matrix> &tran
             normal = vector_transformation(transp, normal);
 
         } else {
-            pair<double, vec3> output = obj->intersect(r);
-            t = output.first;
-            normal = output.second;
+            tuple<double, vec3, vec3> output = obj->intersect(r, texture);
+            t = get<0>(output);
+            normal = get<1>(output);
+            objColor = get<2>(output);
         }
         
         // a interseção só é válida se ocorrer depois do plano
@@ -82,8 +84,6 @@ vec3 color(const ray &r, vector<geometricObj *> &objects, map<int, Matrix> &tran
     geometricObj *objf = objects[ts[0].second];
     normal = normals[ts[0].second];
 
-    vec3 objColor = objf->getColor(texture, resx, resy);
-
     vec3 ambient = vec3(0,0,0);
     //vec3 ambient = objColor;
 
@@ -99,7 +99,7 @@ vec3 color(const ray &r, vector<geometricObj *> &objects, map<int, Matrix> &tran
 
     for (light l : lights) {
         vec3 L = l.origin - intPoint;
-        if (shadow(ray(intPoint, L), objects, l.origin, intPoint)) continue;
+        if (shadow(ray(intPoint, L), objects, l.origin, intPoint, texture)) continue;
 
         L.make_unit_vector();
         
@@ -360,18 +360,16 @@ int main()
     vec3 p16 = vec3(1, 0.5, -1);
 
     std::vector<std::vector<vec3>> control_points = {
-        {vec3(-1, 0, 1), vec3(-0.5, 1, 1), vec3(0.5, 1, 1), vec3(1, 0, 1)},
-        {vec3(-1, 0, 0), vec3(-0.5, 2, 0), vec3(0.5, 2, 0), vec3(1, 0, 0)},
-        {vec3(-1, 0, -1), vec3(-0.5, 1, -1), vec3(0.5, 1.5, -1), vec3(1, 0, -1)},
-        {vec3(-1, -1, 1), vec3(-0.5, -0.5, 1), vec3(0.5, -0.5, 1), vec3(1, -1, 1)},
-        {vec3(-1, -1, 0), vec3(-0.5, -0.5, 0), vec3(0.5, -0.5, 0), vec3(1, -1, 0)},
-        {vec3(-1, -1, -1), vec3(-0.5, -0.5, -1), vec3(0.5, -0.5, -1), vec3(1, -1, -1)}
+        {vec3(-1, 0, 1), vec3(-0.5, 1, 1), vec3(0.5, 1.5, 1), vec3(1, 0, 1)},
+        {vec3(-1, 0.5, 0), vec3(-0.5, 1, 0), vec3(0.5, 2, 0), vec3(1, 0.5, 0)},
+        {vec3(-1, 1, -1), vec3(-0.5, 1.5, -1), vec3(0.5, 1, -1), vec3(1, 0, -1)},
+        {vec3(-1, 1.5, -2), vec3(-0.5, 1, -2), vec3(0.5, 0.5, -2), vec3(1, 0, -2)}
     };
 
-    Bezier bezier_test = Bezier(control_points);
-    Mesh * bezier_surface = bezier_test.triangulate(0.1);
+    Bezier* bezier_test = new Bezier(control_points, vec3(0,0,0), PHONG);
+    bezier_test->triangulate(0.1);
 
-    objects.push_back(bezier_surface);
+    objects.push_back(bezier_test);
 
     fOut << "P3\n";
     fOut << resh << " " << resv << "\n255\n";

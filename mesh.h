@@ -16,8 +16,6 @@
 
 using namespace std;
 
-vec3 triangleNormal;
-
 /*
 Input:
     número de triângulos
@@ -56,8 +54,9 @@ public:
     {
 
         plane plan = plane(A, normal, vec3(0,0,0), 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
-        pair<double, vec3> output = plan.intersect(r);
-        double t = output.first;
+        vector<vector<vec3>> a;
+        tuple<double, vec3, vec3> output = plan.intersect(r, a);
+        double t = get<0>(output);
         if(t>0)
         {
             point3 P = r.point_at(t);
@@ -112,12 +111,12 @@ public:
         }
     }
 
-    pair<double, vec3> intersect(const ray &r)
+    tuple<double, vec3, vec3> intersect(const ray &r, vector<vector<vec3>> &texture)
     {
         auto [t, a] = intersectTriangle(r);
         vec3 normal = a.intNormal(r);
 
-        return {t, normal};
+        return {t, normal, color};
         
     }
 
@@ -139,10 +138,6 @@ public:
         }
 
         return {minT, T};
-    }
-
-    vec3 getColor(vector<vector<vec3>> &texture, int resx, int resy) {
-        return texture[resx][resy];
     }
 
 

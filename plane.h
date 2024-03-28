@@ -9,7 +9,7 @@ public:
     const vec3 &color, double Kd, double Ks, double Ka, double Kr, double Kt, double N)
         : geometricObj(color, Kd, Ks, Ka, Kr, Kt, N), Normal(normal), PP(planepoint) {}
 
-    pair<double, vec3> intersect(const ray &r)
+    tuple<double, vec3, vec3> intersect(const ray &r, vector<vector<vec3>> &texture)
     {
         double t;
 
@@ -23,19 +23,14 @@ public:
         if (c != 0) {
             t = (a - b) / c;
         }
-            
     
-        return {t, intNormal(r,t)};
+        return {t, intNormal(r,t), color};
     }
 
     vec3 intNormal(const ray &r, double t){
         if (dot(r.direction(), Normal) > 0) {
             return vec3(-Normal.x(), -Normal.y(), -Normal.z());
         } else return Normal;
-    }
-
-    vec3 getColor(vector<vector<vec3>> &texture, int resx, int resy) {
-        return color;
     }
 
     point3 PP;
