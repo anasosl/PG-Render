@@ -360,10 +360,12 @@ int main()
     vec3 p16 = vec3(1, 0.5, -1);
 
     std::vector<std::vector<vec3>> control_points = {
-        {vec3(-1, 0, 1), vec3(-0.5, 1, 1), vec3(0.5, 1.5, 1), vec3(1, 0, 1)},
-        {vec3(-1, 0.5, 0), vec3(-0.5, 1, 0), vec3(0.5, 2, 0), vec3(1, 0.5, 0)},
-        {vec3(-1, 1, -1), vec3(-0.5, 1.5, -1), vec3(0.5, 1, -1), vec3(1, 0, -1)},
-        {vec3(-1, 1.5, -2), vec3(-0.5, 1, -2), vec3(0.5, 0.5, -2), vec3(1, 0, -2)}
+        {vec3(-1, 0, 1), vec3(-0.5, 1, 1), vec3(0.5, 1, 1), vec3(1, 0, 1)},
+        {vec3(-1, 0, 0), vec3(-0.5, 2, 0), vec3(0.5, 2, 0), vec3(1, 0, 0)},
+        {vec3(-1, 0, -1), vec3(-0.5, 1, -1), vec3(0.5, 1.5, -1), vec3(1, 0, -1)},
+        {vec3(-1, -1, 1), vec3(-0.5, -0.5, 1), vec3(0.5, -0.5, 1), vec3(1, -1, 1)},
+        {vec3(-1, -1, 0), vec3(-0.5, -0.5, 0), vec3(0.5, -0.5, 0), vec3(1, -1, 0)},
+        {vec3(-1, -1, -1), vec3(-0.5, -0.5, -1), vec3(0.5, -0.5, -1), vec3(1, -1, -1)}
     };
 
     Bezier bezier_test = Bezier(control_points);
@@ -383,7 +385,7 @@ int main()
         {
             ray r(origin, bottomLeftCorner + (x * qx) + (y * qy));
 
-            vec3 col = color(r, objects, transf, lights, origin, 0, texture, y, x);
+            vec3 col = color(r, objects, transf, lights, origin, 0, texture, x, y);
             int ir = int(col.r());
             int ig = int(col.g());
             int ib = int(col.b());

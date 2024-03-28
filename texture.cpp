@@ -9,7 +9,7 @@ using namespace std;
 
 vector<vector<vec3>> getTexture() {
     // Abre o arquivo PPM
-    ifstream file("texture.ppm");
+    ifstream file("image.ppm");
 
     if (!file) {
         cerr << "Erro ao abrir o arquivo." << endl;
