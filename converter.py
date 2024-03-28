@@ -1,3 +1,4 @@
+# pip install Pillow
 from PIL import Image
 
 def convert_to_ppm(input_image_path, output_image_path):
