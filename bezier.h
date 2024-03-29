@@ -65,6 +65,7 @@ class Bezier : public geometricObj {
         point3 B = a.B;
         point3 C = a.C;
 
+        /*
         vec3 PAB = cross(A - P, B - P);
         vec3 PAC = cross(C - P, A - P);
         vec3 PBC = cross(C - P, B - P);
@@ -74,6 +75,21 @@ class Bezier : public geometricObj {
         double alpha = PAB.length()/ABC.length();
         double beta = PAC.length()/ABC.length();
         double gamma = PBC.length()/ABC.length();
+        */
+
+        vec3 AB = B - A;
+        vec3 AC = C - A;
+        vec3 AP = P - A;
+
+        // Produtos cruzados para calcular as áreas dos subtriângulos
+        double areaABC = cross(AB, AC).length();
+        double areaPBC = cross(B - P, C - P).length();
+        double areaPCA = cross(C - P, A - P).length();
+
+        // Coordenadas baricêntricas
+        double alpha = areaPBC / areaABC;
+        double beta = areaPCA / areaABC;
+        double gamma = 1.0 - alpha - beta;
 
         auto [sa, ta] = getST(A);
         auto [sb, tb] = getST(B);
