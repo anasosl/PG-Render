@@ -24,7 +24,7 @@ public:
             t = (a - b) / c;
         }
     
-        return {t, intNormal(r,t), color};
+        return make_tuple(t, intNormal(r,t), color);
     }
 
     vec3 intNormal(const ray &r, double t){

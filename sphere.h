@@ -2,6 +2,8 @@
 #define SPHEREH
 #include "geometricObj.h"
 
+#include <tuple>
+
 class sphere : public geometricObj
 {
 public:
@@ -28,7 +30,7 @@ public:
         else
             t = -1;
 
-        return {t, intNormal(r, t), color};
+        return make_tuple(t, intNormal(r,t), color);
     }
     vec3 intNormal(const ray &r, double t) {
         return (r.origin() + t*r.direction()) - Center;

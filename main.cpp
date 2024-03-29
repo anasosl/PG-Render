@@ -27,7 +27,10 @@ bool shadow(const ray &r, vector<geometricObj*> &objects, point3 lightOrigin, po
     for (long long unsigned int i = 0; i < objects.size(); i++)
     { 
         geometricObj *obj = objects[i];
-        auto [t, normal, color] = obj->intersect(r, texture);
+        tuple<double, vec3, vec3> output = obj->intersect(r, texture);
+        double t = get<0>(output);
+        vec3 normal = get<1>(output);
+        vec3 objColor = get<2>(output);
 
         if (t > EPSILON && t < 1) {
             return true;

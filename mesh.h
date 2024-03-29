@@ -6,6 +6,7 @@
 #include <iostream>
 #include <vector>
 #include <queue>
+#include <tuple>
 
 #include "geometricObj.h"
 #include "vec3.h"
@@ -116,7 +117,7 @@ public:
         auto [t, a] = intersectTriangle(r);
         vec3 normal = a.intNormal(r);
 
-        return {t, normal, color};
+        return make_tuple(t, normal, color);
         
     }
 

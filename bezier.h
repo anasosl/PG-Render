@@ -34,8 +34,13 @@ class Bezier : public geometricObj {
     {
         auto [t, a] = intersectTriangle(r);
         vec3 normal = a.intNormal(r);
+        vec3 color = vec3(0,0,0);
 
-        vec3 color = getColor(a, r.point_at(t), texture);
+        if (t != 10000000) {
+            color = getColor(a, r.point_at(t), texture);
+        }
+
+        
 
         return {t, normal, color};
         
